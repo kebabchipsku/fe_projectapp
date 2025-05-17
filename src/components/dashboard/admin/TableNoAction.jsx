@@ -1,4 +1,3 @@
-import React from "react";
 import Pagination from "../../Pagination";
 
 const TableNoAction = ({
@@ -15,6 +14,7 @@ const TableNoAction = ({
   children,
   placeholder,
   setPage,
+  content,
 }) => {
   let tableContent;
 
@@ -38,7 +38,7 @@ const TableNoAction = ({
       <tr>
         <td colSpan={TABLE_HEAD.length} className="p-4 text-center">
           <h1 className="text-gray-900 text-sm font-normal">
-            Tidak ada instansi tersedia
+            {`Tidak ada ${content} tersedia`}
           </h1>
         </td>
       </tr>
@@ -58,6 +58,8 @@ const TableNoAction = ({
                 <input
                   type="text"
                   value={query}
+                  name="search_query"
+                  id="search_query"
                   onChange={(e) => setQuery(e.target.value)}
                   className="py-1.5 sm:py-2 px-3 ps-9 block w-full border border-obito-grey shadow-2xs rounded-lg sm:text-sm focus:z-10 focus:border-blue-800 focus:ring-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                   placeholder={placeholder}

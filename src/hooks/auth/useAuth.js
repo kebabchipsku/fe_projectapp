@@ -7,9 +7,9 @@ import {
 } from "../../lib/auth/authAPI";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { HSOverlay } from "preline/preline";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import { HSOverlay } from "preline/preline";
 
 export const useAuth = () => {
   const navigate = useNavigate();

@@ -1,7 +1,4 @@
 import { Routes } from "react-router-dom";
-
-import React from "react";
-
 import mainRoute from "./routes/mainRoute";
 import dashboardRoute from "./routes/dashboardRoute/indexRoute";
 import authRoute from "./routes/authRoute";

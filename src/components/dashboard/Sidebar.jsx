@@ -1,42 +1,44 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard,
-  ChartColumnStacked,
-  UserRoundCog,
-  FileQuestion,
-  Building,
-} from "lucide-react";
+  MdOutlineFamilyRestroom,
+  MdCategory,
+  MdQuestionAnswer,
+} from "react-icons/md";
+import { TbLayoutDashboardFilled } from "react-icons/tb";
+import { RiUserSettingsFill, RiQuestionnaireFill } from "react-icons/ri";
+import { HiMiniBuildingOffice } from "react-icons/hi2";
+import { BsBuildingFillGear } from "react-icons/bs";
 
 const SidebarItemAdmin = [
   {
     id: 1,
     name: "Dashboard",
-    icon: <LayoutDashboard className="w-4 h-4" />,
+    icon: <TbLayoutDashboardFilled className="w-4 h-4" />,
     path: "/admin/dashboard",
   },
   {
     id: 2,
     name: "Manajemen Pengguna",
-    icon: <UserRoundCog className="w-4 h-4" />,
+    icon: <RiUserSettingsFill className="w-4 h-4" />,
     path: "/admin/management-users",
   },
   {
     id: 3,
     name: "Daftar Instansi",
-    icon: <Building className="w-4 h-4" />,
+    icon: <HiMiniBuildingOffice className="w-4 h-4" />,
     path: "/admin/institution",
   },
   {
     id: 4,
     name: "Daftar Kategori",
-    icon: <ChartColumnStacked className="w-4 h-4" />,
+    icon: <MdCategory className="w-4 h-4" />,
     path: "/admin/category",
   },
   {
     id: 5,
     name: "Daftar Pertanyaan",
-    icon: <FileQuestion className="w-4 h-4" />,
+    icon: <MdQuestionAnswer className="w-4 h-4" />,
     path: "/admin/question",
   },
 ];
@@ -45,20 +47,41 @@ const SidebarItemSchool = [
   {
     id: 1,
     name: "Dashboard",
-    icon: <LayoutDashboard className="w-4 h-4" />,
+    icon: <TbLayoutDashboardFilled className="w-4 h-4" />,
     path: "/school/dashboard",
   },
   {
     id: 2,
     name: "Pertanyaan",
-    icon: <FileQuestion className="w-4 h-4" />,
+    icon: <RiQuestionnaireFill className="w-4 h-4" />,
     path: "/school/quesioner",
   },
   {
     id: 3,
     name: "Manajemen Guru",
-    icon: <UserRoundCog className="w-4 h-4" />,
+    icon: <RiUserSettingsFill className="w-4 h-4" />,
     path: "/school/management-teachers",
+  },
+  {
+    id: 4,
+    name: "Manajemen Kelas",
+    icon: <BsBuildingFillGear className="w-4 h-4" />,
+    path: "/school/management-classes",
+  },
+];
+
+const SidebarItemParent = [
+  {
+    id: 1,
+    name: "Dashboard",
+    icon: <TbLayoutDashboardFilled className="w-4 h-4" />,
+    path: "/parent/dashboard",
+  },
+  {
+    id: 2,
+    name: "Manajemen Keluarga",
+    icon: <MdOutlineFamilyRestroom className="w-4 h-4" />,
+    path: "/parent/management-family",
   },
 ];
 
@@ -72,6 +95,9 @@ const Sidebar = () => {
       break;
     case location.pathname.startsWith("/school"):
       sidebarItems = SidebarItemSchool;
+      break;
+    case location.pathname.startsWith("/parent"):
+      sidebarItems = SidebarItemParent;
       break;
     default:
       sidebarItems = [];
@@ -96,15 +122,15 @@ const Sidebar = () => {
       <div className="relative flex flex-col h-full max-h-full">
         <div className="px-6 pt-6 flex items-center">
           {/* Logo */}
-          <a className="flex items-center gap-2" href="/" aria-label="logo">
-            <div className="aspect-square w-6 h-6">
-              <img src="/logo.png" alt="logo" className="w-6 h-6" />
+          <div className="flex items-center gap-3" aria-label="logo">
+            <div className="aspect-square w-6 h-6 bg-white rounded-md flex items-center justify-center">
+              <img src="/logo.png" alt="logo" className="w-4 h-4" />
             </div>
             <div className="flex flex-col space-y-3 text-white">
               <h1 className="text-sm font-bold leading-0">Jalinan</h1>
               <p className="text-xs leading-0">Anak Sehat</p>
             </div>
-          </a>
+          </div>
           {/* End Logo */}
 
           <div className="hidden lg:block ms-2"></div>
@@ -121,12 +147,9 @@ const Sidebar = () => {
                 <li key={item.id} className="text-white">
                   <NavLink
                     to={item.path}
-                    end
                     className={({ isActive }) =>
                       `flex items-center gap-2 p-3 rounded-xl ${
-                        isActive
-                          ? "after:content[' '] after:absolute after:bg-obito-background after:w-3 after:h-5 after:-right-2"
-                          : null
+                        isActive ? "bg-white text-blue-800 font-semibold" : null
                       }`
                     }
                   >

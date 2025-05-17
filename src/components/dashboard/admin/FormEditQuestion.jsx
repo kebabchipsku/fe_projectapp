@@ -1,5 +1,7 @@
 import React from "react";
-import { MoveRight, Plus, Trash2 } from "lucide-react";
+import { MdArrowRightAlt } from "react-icons/md";
+import { HiTrash } from "react-icons/hi";
+import { FaPlus } from "react-icons/fa6";
 import { HSStaticMethods } from "preline/preline";
 import { useFormik } from "formik";
 import { useQuesioner } from "../../../hooks/useQuesioner";
@@ -72,7 +74,7 @@ const FormEditQuestion = ({ existingData }) => {
         <div className="flex items-center col-start-1 col-end-1 w-min">
           <h1 className="flex items-center gap-2 w-max">
             Q {calculateQuestionNumber(existingData?.id)}{" "}
-            <MoveRight size={16} />
+            <MdArrowRightAlt size={20} />
           </h1>
         </div>
         <div className="col-start-2 col-end-2">
@@ -131,7 +133,7 @@ const FormEditQuestion = ({ existingData }) => {
                     type="text"
                     id="opsi"
                     name="opsi"
-                    className="py-2.5 sm:py-3 px-4 block w-full border border-obito-grey rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                    className="py-2.5 sm:py-3 px-4 block w-full border border-obito-grey rounded-lg sm:text-sm focus:border-blue-800 focus:ring-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                     value={opt.title}
                     onChange={(e) =>
                       handleOptionChange(index, "title", e.target.value)
@@ -149,7 +151,7 @@ const FormEditQuestion = ({ existingData }) => {
                     type="number"
                     id="skor"
                     name="skor"
-                    className="py-2.5 sm:py-3 px-4 block w-full border border-obito-grey rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                    className="py-2.5 sm:py-3 px-4 block w-full border border-obito-grey rounded-lg sm:text-sm focus:border-blue-800 focus:ring-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                     value={opt.score}
                     onChange={(e) =>
                       handleOptionChange(index, "score", e.target.value)
@@ -161,7 +163,7 @@ const FormEditQuestion = ({ existingData }) => {
                   onClick={() => handleRemoveOption(opt.id)}
                   className="inline-flex w-[14%] self-end justify-center items-center size-[46px] rounded-lg border-4 border-red-100 bg-red-200"
                 >
-                  <Trash2 size={16} className="text-red-900" />
+                  <HiTrash size={16} className="text-red-900" />
                 </button>
               </div>
             </div>
@@ -174,7 +176,7 @@ const FormEditQuestion = ({ existingData }) => {
           onClick={handleAddOption}
           className="p-2 m-4 flex items-center gap-1 hover:bg-blue-100 rounded-lg"
         >
-          <Plus size={16} className="text-blue-900" />
+          <FaPlus size={16} className="text-blue-900" />
           <span className="text-sm font-medium text-blue-900">Opsi</span>
         </button>
         <button

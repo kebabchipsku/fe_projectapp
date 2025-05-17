@@ -51,6 +51,7 @@ const Category = () => {
         searchData={searchData}
         dataKey={"categories"}
         placeholder="Kategori"
+        content="kategori"
       >
         {(item, index) => (
           <tr key={item.id}>

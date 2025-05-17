@@ -1,5 +1,14 @@
 import api from "./api";
 
+export const getQuesioners = async () => {
+  try {
+    const response = await api.get(import.meta.env.VITE_API_GET_QUESIONERS);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const getQuestions = async (keyword, page, limit) => {
   try {
     const response = await api.get(import.meta.env.VITE_API_GET_QUESTIONS, {

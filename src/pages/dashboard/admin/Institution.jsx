@@ -51,6 +51,7 @@ const Institution = () => {
         searchData={searchData}
         dataKey={"institutions"}
         placeholder="Nama, Email, Provinsi, Kota"
+        content="instansi"
       >
         {(item) => (
           <tr key={item.id}>

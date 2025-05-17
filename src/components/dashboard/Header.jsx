@@ -1,6 +1,6 @@
 import React from "react";
 import { HSStaticMethods } from "preline/preline";
-import { LogOut } from "lucide-react";
+import { RiLogoutCircleRLine } from "react-icons/ri";
 import { useAuth } from "../../hooks/auth/useAuth";
 
 const Header = () => {
@@ -134,7 +134,7 @@ const Header = () => {
                     className="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-900 hover:bg-red-100 hover:text-red-500 focus:outline-hidden focus:bg-gray-100 cursor-pointer"
                     onClick={() => logout()}
                   >
-                    <LogOut size={16} />
+                    <RiLogoutCircleRLine size={16} />
                     Keluar
                   </div>
                 </div>

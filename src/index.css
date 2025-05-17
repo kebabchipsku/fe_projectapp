@@ -2,6 +2,8 @@
 
 @import "tailwindcss";
 @import "../node_modules/preline/variants.css";
+@import "../src/calendar.css";
+@plugin "@tailwindcss/forms";
 
 @theme {
   --color-obito-black: #0a0723;

@@ -1,5 +1,7 @@
 import React from "react";
-import { AtSign, Lock, Eye, EyeOff } from "lucide-react";
+import { MdLockOutline } from "react-icons/md";
+import { PiUserFocusBold } from "react-icons/pi";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import InputForm from "../../components/auth/InputForm";
 import { Link } from "react-router-dom";
 import { useFormik } from "formik";
@@ -31,7 +33,7 @@ const SignIn = () => {
         onChange={handleChange}
         onBlur={handleBlur}
       >
-        <AtSign
+        <PiUserFocusBold
           size={16}
           className="absolute top-1/2 -translate-y-1/2 left-4"
         />
@@ -46,15 +48,18 @@ const SignIn = () => {
         onChange={handleChange}
         onBlur={handleBlur}
       >
-        <Lock size={16} className="absolute top-1/2 -translate-y-1/2 left-4" />
+        <MdLockOutline
+          size={16}
+          className="absolute top-1/2 -translate-y-1/2 left-4"
+        />
         {handlePassword ? (
-          <Eye
+          <IoEyeOutline
             size={16}
             className="absolute top-1/2 -translate-y-1/2 right-4 cursor-pointer"
             onClick={() => setHandlePassword(!handlePassword)}
           />
         ) : (
-          <EyeOff
+          <IoEyeOffOutline
             size={16}
             className="absolute top-1/2 -translate-y-1/2 right-4 cursor-pointer"
             onClick={() => setHandlePassword(!handlePassword)}

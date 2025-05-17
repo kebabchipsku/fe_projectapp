@@ -1,22 +1,24 @@
 import React from "react";
 import { HSStaticMethods } from "preline/preline";
-import { getAllUsers } from "../../../lib/admin/users/usersAPI";
 import { useAuth } from "../../../hooks/auth/useAuth";
 import useSWR from "swr";
 import { token } from "../../../lib/auth/authAPI";
 import { jwtDecode } from "jwt-decode";
 import Pagination from "../../Pagination";
+import { getFamilyMember } from "../../../lib/parent/familiesAPI";
 
 const TABLE_HEAD = [
-  "Username",
-  "Instansi",
-  "Email",
-  "Telepon Instansi",
-  "Role",
+  "Nama Lengkap",
+  "Tanggal Lahir",
+  "Jenis Kelamin",
+  "Hubungan",
+  "Tinggi Badan",
+  "Berat Badan",
+  "Kesehatan",
   "Aksi",
 ];
 
-const Table = ({ children }) => {
+const TableFamilyMember = ({ children }) => {
   const { accessToken, setAccessToken, user, setUser } = useAuth();
 
   React.useEffect(() => {
@@ -32,23 +34,24 @@ const Table = ({ children }) => {
 
   let tableContent;
 
-  const Fetchuser = async () => {
-    const response = await getAllUsers(accessToken, keyword, page, limit);
+  const Fetchfamilymember = async () => {
+    const response = await getFamilyMember(accessToken, keyword, page, limit);
     setPage(response.data.page);
     setPages(response.data.totalPage);
     setRows(response.data.totalRows);
     return response.data;
   };
 
-  const { data, isLoading, mutate } = useSWR(["users", keyword, page], () =>
-    Fetchuser()
+  const { data, isLoading, mutate } = useSWR(
+    ["familyMembers", keyword, page],
+    () => Fetchfamilymember()
   );
 
   const searchData = (e) => {
     e.preventDefault();
     setPage(0);
     setKeyword(query);
-    mutate("users", { revalidate: true });
+    mutate("familyMembers", { revalidate: true });
   };
 
   React.useEffect(() => {
@@ -88,39 +91,63 @@ const Table = ({ children }) => {
         </td>
       </tr>
     ));
-  } else if (data && data?.users?.length > 0) {
-    tableContent = data.users.map((user) => {
-      let roleName = "";
-      switch (user?.role?.name) {
-        case "school":
-          roleName = "Admin Sekolah";
+  } else if (data && data?.familyMembers?.length > 0) {
+    tableContent = data.familyMembers.map((fm) => {
+      let gender = "";
+      switch (fm?.gender) {
+        case "L":
+          gender = "Laki-laki";
           break;
-        case "healthcare":
-          roleName = "Admin Puskesmas";
+        case "P":
+          gender = "Perempuan";
           break;
-        case "parent":
-          roleName = "Orang Tua";
-          break;
-        default:
-          roleName = "Admin";
       }
 
+      const birthday = (dateString) => {
+        if (!dateString) return "-";
+        const bulan = [
+          "Januari",
+          "Februari",
+          "Maret",
+          "April",
+          "Mei",
+          "Juni",
+          "Juli",
+          "Agustus",
+          "September",
+          "Oktober",
+          "November",
+          "Desember",
+        ];
+        const date = new Date(dateString);
+        const tanggal = date.getDate();
+        const bulanNama = bulan[date.getMonth()];
+        const tahun = date.getFullYear();
+        return `${tanggal} ${bulanNama} ${tahun}`;
+      };
+
       return (
-        <tr key={user.id}>
+        <tr key={fm.id}>
           <td className="px-6 py-4 capitalize whitespace-nowrap text-sm font-medium text-gray-800">
-            {user?.username}
+            {fm?.fullName ?? "-"}
           </td>
           <td className="px-6 py-4 capitalize whitespace-nowrap text-sm font-medium text-gray-800">
-            {user?.institution?.name ?? "-"}
+            {birthday(fm?.birthDate)}
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-            {user?.email}
+            {gender ?? "-"}
           </td>
-          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-            {user?.institution?.phone ?? "-"}
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 capitalize">
+            {fm?.relation ?? "-"}
           </td>
-          <td className="px-6 py-4 whitespace-nowrap capitalize text-sm text-gray-800">
-            {roleName}
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 capitalize">
+            {fm?.nutrition[0]?.height ?? "-"}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 capitalize">
+            {fm?.nutrition[0]?.weight ?? "-"}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 capitalize">
+            {fm?.nutrition[0]?.nutritionStatus?.information ?? "-"}
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
             <button
@@ -192,16 +219,6 @@ const Table = ({ children }) => {
                     Cari
                   </button>
                 </form>
-                <button
-                  type="button"
-                  className="py-2.5 px-3.5 inline-flex items-center gap-x-2 text-xs font-medium rounded-lg border border-transparent bg-blue-800 text-white hover:bg-blue-900 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-                  aria-haspopup="dialog"
-                  aria-expanded="false"
-                  aria-controls="modal-add-users"
-                  data-hs-overlay="#modal-add-users"
-                >
-                  Tambah Pengguna
-                </button>
                 <div
                   id="modal-add-users"
                   className="hs-overlay [--overlay-backdrop:static] hidden size-full fixed top-0 start-0 z-100 overflow-x-hidden overflow-y-auto pointer-events-none bg-gray-900/50"
@@ -281,4 +298,4 @@ const Table = ({ children }) => {
   );
 };
 
-export default Table;
+export default TableFamilyMember;

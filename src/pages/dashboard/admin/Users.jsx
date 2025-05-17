@@ -1,14 +1,19 @@
 import React from "react";
 import Table from "../../../components/dashboard/admin/Table";
-import FormAddUser from "../../../components/dashboard/admin/FormAddUser";
+import FormAddUser from "../../../components/FormAddDouble";
 import useSWR from "swr";
 import { useFormik } from "formik";
 import { getCities } from "../../../lib/cityAPI";
 import { getProvinces } from "../../../lib/provinceAPI";
 import { getInstitutionType } from "../../../lib/institutionsAPI";
 import { useAuth } from "../../../hooks/auth/useAuth";
+import { HSStaticMethods } from "preline/preline";
 
 const Users = () => {
+  React.useEffect(() => {
+    HSStaticMethods.autoInit();
+  }, []);
+
   const { registerInstitution } = useAuth();
 
   const province = async () => {
@@ -142,7 +147,7 @@ const Users = () => {
                   <textarea
                     id="institutionAddress"
                     name="institutionAddress"
-                    className="py-2 px-3 sm:py-3 sm:px-4 block w-full border border-obito-grey rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                    className="py-2 px-3 sm:py-3 sm:px-4 block w-full border border-obito-grey rounded-lg sm:text-sm focus:border-blue-800 focus:ring-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                     rows="1"
                     placeholder="Jl. Telekomunikasi No. 1, Bandung"
                     onChange={handleChange}
@@ -199,15 +204,15 @@ const Users = () => {
                     data-hs-select='{
                     "hasSearch": true,
                     "searchPlaceholder": "Cari...",
-                    "searchClasses": "block w-full sm:text-sm border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 before:absolute before:inset-0 before:z-1 py-1.5 sm:py-2 px-3",
+                    "searchClasses": "block w-full sm:text-sm border-gray-200 rounded-lg focus:border-blue-800 focus:ring-blue-800 before:absolute before:inset-0 before:z-1 py-1.5 sm:py-2 px-3",
                     "searchWrapperClasses": "bg-white p-2 -mx-1 sticky top-0",
                     "placeholder": "Pilh Kota...",
                     "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
                     "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-800",
                     "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300",
                     "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50",
-                    "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"shrink-0 size-3.5 text-blue-600 dark:text-blue-500 \" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
-                    "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"shrink-0 size-3.5 text-gray-500 dark:text-neutral-500 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
+                    "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"shrink-0 size-3.5 text-blue-600 \" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
+                    "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"shrink-0 size-3.5 text-gray-500 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
                   }'
                     className="hidden"
                   >
@@ -235,7 +240,7 @@ const Users = () => {
                     data-hs-select='{
                     "hasSearch": true,
                     "searchPlaceholder": "Cari...",
-                    "searchClasses": "block w-full sm:text-sm border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 before:absolute before:inset-0 before:z-1 py-1.5 sm:py-2 px-3",
+                    "searchClasses": "block w-full sm:text-sm border-gray-200 rounded-lg focus:border-blue-800 focus:ring-blue-800 before:absolute before:inset-0 before:z-1 py-1.5 sm:py-2 px-3",
                     "searchWrapperClasses": "bg-white p-2 -mx-1 sticky top-0",
                     "placeholder": "Pilh Tipe Instansi...",
                     "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
