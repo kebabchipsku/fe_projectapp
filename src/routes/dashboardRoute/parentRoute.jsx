@@ -4,6 +4,7 @@ import DashboardPage from "../../pages/dashboard/parent/Index";
 import ProtectedRoute from "../guardsRoute/protectedRoute";
 import Family from "../../pages/dashboard/parent/Family";
 import Question from "../../pages/dashboard/parent/Question";
+import FamilyMemberGuard from "../guardsRoute/FamilyMemberGuard";
 
 const parentRoute = () => {
   return (
@@ -20,10 +21,11 @@ const parentRoute = () => {
           </ProtectedRoute>
         }
       >
-        <Route path="dashboard" element={<DashboardPage />} />
-
-        <Route path="management-family" element={<Family />} />
-        <Route path="quesioner" element={<Question />} />
+        <Route element={<FamilyMemberGuard />}>
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="management-family" element={<Family />} />
+          <Route path="quesioner" element={<Question />} />
+        </Route>
       </Route>
     </>
   );

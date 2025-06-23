@@ -91,7 +91,6 @@ const Question = () => {
     },
   });
 
-  // === CEK STATUS ANSWERED ===
   const [answeredStatus, setAnsweredStatus] = React.useState({});
 
   React.useEffect(() => {
@@ -118,7 +117,6 @@ const Question = () => {
     }
   }, [quesioner, accessToken]);
 
-  // === AMBIL RIWAYAT JAWABAN ===
   const [page, setPage] = React.useState({});
   const [limit, setLimit] = React.useState({});
   const [keyword, setKeyword] = React.useState({});

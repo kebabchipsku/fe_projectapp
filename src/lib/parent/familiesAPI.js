@@ -30,9 +30,19 @@ export const getFamilyMember = async (token, keyword, page, limit) => {
   }
 };
 
+export const getParentFamilyMember = async (id) => {
+  try {
+    const response = await api.get(
+      `${import.meta.env.VITE_API_GET_PARENT}/${id}/parents`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const createFamilyMember = async (data, accessToken) => {
   try {
-
     console.log("Token yang dikirim:", accessToken);
 
     const response = await api.post(

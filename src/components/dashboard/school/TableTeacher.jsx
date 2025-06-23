@@ -44,7 +44,7 @@ const TableTeacher = ({
     return response.data;
   };
 
-  const { data, isLoading } = useSWR(["teachers", keyword, page], () =>
+  const { data, isLoading, mutate } = useSWR(["teachers", keyword, page], () =>
     teachers()
   );
 
@@ -117,6 +117,10 @@ const TableTeacher = ({
     setKeyword(query);
     mutate("teachers", { revalidate: true });
   };
+
+  React.useEffect(() => {
+    mutate();
+  }, [keyword, page, mutate]);
 
   const updateToken = async () => {
     const currentTime = new Date().getTime();

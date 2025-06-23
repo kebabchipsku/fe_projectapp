@@ -220,8 +220,6 @@ const Family = () => {
         return false;
       });
 
-      console.log(dbData);
-
       if (dbData) {
         const initial = getInitialValues(currentIndex);
         Object.keys(initial).forEach((key) => {
@@ -241,101 +239,24 @@ const Family = () => {
               break;
             case "education":
               setFieldValue("education", dbData.education ?? "");
-              setTimeout(() => {
-                const el = document.getElementById("educationIbu");
-                const hsSelect = el ? HSSelect.getInstance(el, true) : null;
-                if (hsSelect) {
-                  hsSelect.element.setValue(dbData.education ?? "");
-                }
-                const el2 = document.getElementById("educationAyah");
-                const hsSelect2 = el2 ? HSSelect.getInstance(el2, true) : null;
-
-                if (hsSelect2) {
-                  hsSelect2.element.setValue(dbData.education ?? "");
-                }
-                const el3 = document.getElementById("educationAnak");
-                const hsSelect3 = el3 ? HSSelect.getInstance(el3, true) : null;
-                if (hsSelect3) {
-                  hsSelect3.element.setValue(dbData.education ?? "");
-                }
-              }, 0);
               break;
             case "gender":
               setFieldValue("gender", dbData.gender ?? "");
-              setTimeout(() => {
-                const el = document.getElementById("genderIbu");
-                const el2 = document.getElementById("genderAyah");
-                const hsSelect = el ? HSSelect.getInstance(el, true) : null;
-                const hsSelect2 = el2 ? HSSelect.getInstance(el2, true) : null;
-                if (hsSelect) {
-                  hsSelect.element.setValue(dbData.gender ?? "");
-                }
-                if (hsSelect2) {
-                  hsSelect2.element.setValue(dbData.gender ?? "");
-                }
-                const el3 = document.getElementById("genderAnak");
-                const hsSelect3 = el3 ? HSSelect.getInstance(el3, true) : null;
-                if (hsSelect3) {
-                  hsSelect3.element.setValue(dbData.gender ?? "");
-                }
-              }, 0);
               break;
             case "relation":
               setFieldValue("relation", dbData.relation ?? "");
-              setTimeout(() => {
-                const el = document.getElementById("relationIbu");
-                const el2 = document.getElementById("relationAyah");
-                const hsSelect = el ? HSSelect.getInstance(el, true) : null;
-                const hsSelect2 = el2 ? HSSelect.getInstance(el2, true) : null;
-                if (hsSelect) {
-                  hsSelect.element.setValue(dbData.relation ?? "");
-                }
-                if (hsSelect2) {
-                  hsSelect2.element.setValue(dbData.relation ?? "");
-                }
-                const el3 = document.getElementById("relationAnak");
-                const hsSelect3 = el3 ? HSSelect.getInstance(el3, true) : null;
-                if (hsSelect3) {
-                  hsSelect3.element.setValue(dbData.relation ?? "");
-                }
-              }, 0);
               break;
             case "phone":
               setFieldValue("phone", dbData.phone ?? "");
               break;
             case "jobTypeId":
-              setFieldValue("jobTypeId", dbData.job?.jobType?.id ?? "");
-              setTimeout(() => {
-                const el = document.getElementById("jobTypeIdIbu");
-                const el2 = document.getElementById("jobTypeIdAyah");
-                const hsSelect = el ? HSSelect.getInstance(el, true) : null;
-                const hsSelect2 = el2 ? HSSelect.getInstance(el2, true) : null;
-                if (hsSelect) {
-                  hsSelect.element.setValue(
-                    dbData.job?.jobType?.id.toString() ?? ""
-                  );
-                }
-                if (hsSelect2) {
-                  hsSelect2.element.setValue(
-                    dbData.job?.jobType?.id.toString() ?? ""
-                  );
-                }
-              }, 0);
+              setFieldValue(
+                "jobTypeId",
+                dbData.job?.jobType?.id.toString() ?? ""
+              );
               break;
             case "income":
-              setFieldValue("income", dbData.job?.income ?? "");
-              setTimeout(() => {
-                const el = document.getElementById("incomeIbu");
-                const el2 = document.getElementById("incomeAyah");
-                const hsSelect = el ? HSSelect.getInstance(el, true) : null;
-                const hsSelect2 = el2 ? HSSelect.getInstance(el2, true) : null;
-                if (hsSelect) {
-                  hsSelect.element.setValue(dbData.job?.income ?? "");
-                }
-                if (hsSelect2) {
-                  hsSelect2.element.setValue(dbData.job?.income ?? "");
-                }
-              }, 0);
+              setFieldValue("income", dbData.job?.income.toString() ?? "");
               break;
             case "height":
               setFieldValue("height", dbData.nutrition?.[0]?.height ?? "");
@@ -345,18 +266,6 @@ const Family = () => {
               break;
             case "status":
               setFieldValue("status", dbData.residence?.status ?? "");
-              setTimeout(() => {
-                const el = document.getElementById("statusIbu");
-                const el2 = document.getElementById("statusAyah");
-                const hsSelect = el ? HSSelect.getInstance(el, true) : null;
-                const hsSelect2 = el2 ? HSSelect.getInstance(el2, true) : null;
-                if (hsSelect) {
-                  hsSelect?.element?.setValue(dbData.residence?.status ?? "");
-                }
-                if (hsSelect2) {
-                  hsSelect2?.element?.setValue(dbData.residence?.status ?? "");
-                }
-              }, 0);
               break;
             case "address":
               setFieldValue("address", dbData.residence?.address ?? "");
@@ -372,50 +281,21 @@ const Family = () => {
               break;
             case "schoolYear":
               setFieldValue("schoolYear", dbData.student?.schoolYear ?? "");
-              setTimeout(() => {
-                const el = document.getElementById("schoolYear");
-                const hsSelect = el ? HSSelect.getInstance(el, true) : null;
-                if (hsSelect) {
-                  hsSelect.element.setValue(dbData.student?.schoolYear ?? "");
-                }
-              }, 0);
               break;
             case "semester":
               setFieldValue("semester", dbData.student?.semester ?? "");
-              setTimeout(() => {
-                const el = document.getElementById("semester");
-                const hsSelect = el ? HSSelect.getInstance(el, true) : null;
-                if (hsSelect) {
-                  hsSelect.element.setValue(dbData.student?.semester ?? "");
-                }
-              }, 0);
               break;
             case "schoolId":
               setFieldValue(
                 "schoolId",
                 dbData.student?.institution?.id?.toString() ?? ""
               );
-              setTimeout(() => {
-                const el = document.getElementById("schoolId");
-                const hsSelect = el ? HSSelect.getInstance(el, true) : null;
-                if (hsSelect) {
-                  hsSelect.element.setValue(
-                    dbData.student?.institution?.id?.toString() ?? ""
-                  );
-                }
-              }, 0);
               break;
             case "classId":
-              setFieldValue("classId", dbData.student?.class?.id ?? "");
-              setTimeout(() => {
-                const el = document.getElementById("classId");
-                const hsSelect = el ? HSSelect.getInstance(el, true) : null;
-                if (hsSelect) {
-                  hsSelect.element.setValue(
-                    dbData.student?.class?.id?.toString() ?? ""
-                  );
-                }
-              }, 0);
+              setFieldValue(
+                "classId",
+                dbData.student?.class?.id?.toString() ?? ""
+              );
               break;
             default:
           }
@@ -434,7 +314,6 @@ const Family = () => {
           }
         }
       } else {
-        // Jika belum ada, kosongkan form
         const initial = getInitialValues(currentIndex);
         Object.keys(initial).forEach((key) => {
           if (key === "type") {
@@ -447,6 +326,153 @@ const Family = () => {
     }
     // eslint-disable-next-line
   }, [currentIndex, familyMembersData, setFieldValue]);
+
+  React.useEffect(() => {
+    const elEducationIbu = document.getElementById("educationIbu");
+    const elEducationAyah = document.getElementById("educationAyah");
+    const elEducationAnak = document.getElementById("educationAnak");
+    const selectedEducationIbu = elEducationIbu
+      ? HSSelect.getInstance(elEducationIbu, true)
+      : null;
+    const selectedEducationAyah = elEducationAyah
+      ? HSSelect.getInstance(elEducationAyah, true)
+      : null;
+    const selectedEducationAnak = elEducationAnak
+      ? HSSelect.getInstance(elEducationAnak, true)
+      : null;
+    if (selectedEducationIbu) {
+      selectedEducationIbu.element.setValue(values.education);
+    }
+    if (selectedEducationAyah) {
+      selectedEducationAyah.element.setValue(values.education);
+    }
+    if (selectedEducationAnak) {
+      selectedEducationAnak.element.setValue(values.education);
+    }
+    const elGenderIbu = document.getElementById("genderIbu");
+    const elGenderAyah = document.getElementById("genderAyah");
+    const elGenderAnak = document.getElementById("genderAnak");
+    const selectedGenderIbu = elGenderIbu
+      ? HSSelect.getInstance(elGenderIbu, true)
+      : null;
+    const selectedGenderAyah = elGenderAyah
+      ? HSSelect.getInstance(elGenderAyah, true)
+      : null;
+    const selectedGenderAnak = elGenderAnak
+      ? HSSelect.getInstance(elGenderAnak, true)
+      : null;
+    if (selectedGenderIbu) {
+      selectedGenderIbu.element.setValue(values.gender);
+    }
+    if (selectedGenderAyah) {
+      selectedGenderAyah.element.setValue(values.gender);
+    }
+    if (selectedGenderAnak) {
+      selectedGenderAnak.element.setValue(values.gender);
+    }
+    const elRelationIbu = document.getElementById("relationIbu");
+    const elRelationAyah = document.getElementById("relationAyah");
+    const elRelationAnak = document.getElementById("relationAnak");
+    const selectedRelationIbu = elRelationIbu
+      ? HSSelect.getInstance(elRelationIbu, true)
+      : null;
+    const selectedRelationAyah = elRelationAyah
+      ? HSSelect.getInstance(elRelationAyah, true)
+      : null;
+    const selectedRelationAnak = elRelationAnak
+      ? HSSelect.getInstance(elRelationAnak, true)
+      : null;
+    if (selectedRelationIbu) {
+      selectedRelationIbu.element.setValue(values.relation);
+    }
+    if (selectedRelationAyah) {
+      selectedRelationAyah.element.setValue(values.relation);
+    }
+    if (selectedRelationAnak) {
+      selectedRelationAnak.element.setValue(values.relation);
+    }
+    const elJobTypeIbu = document.getElementById("jobTypeIdIbu");
+    const elJobTypeAyah = document.getElementById("jobTypeIdAyah");
+    const selectedJobTypeIbu = elJobTypeIbu
+      ? HSSelect.getInstance(elJobTypeIbu, true)
+      : null;
+    const selectedJobTypeAyah = elJobTypeAyah
+      ? HSSelect.getInstance(elJobTypeAyah, true)
+      : null;
+    if (selectedJobTypeIbu) {
+      selectedJobTypeIbu.element.setValue(values.jobTypeId || "");
+    }
+    if (selectedJobTypeAyah) {
+      selectedJobTypeAyah.element.setValue(values.jobTypeId || "");
+    }
+    const elIncomeIbu = document.getElementById("incomeIbu");
+    const elIncomeAyah = document.getElementById("incomeAyah");
+    const selectedIncomeIbu = elIncomeIbu
+      ? HSSelect.getInstance(elIncomeIbu, true)
+      : null;
+    const selectedIncomeAyah = elIncomeAyah
+      ? HSSelect.getInstance(elIncomeAyah, true)
+      : null;
+    if (selectedIncomeIbu) {
+      selectedIncomeIbu.element.setValue(values.income || "");
+    }
+    if (selectedIncomeAyah) {
+      selectedIncomeAyah.element.setValue(values.income || "");
+    }
+    const elStatusIbu = document.getElementById("statusIbu");
+    const elStatusAyah = document.getElementById("statusAyah");
+    const selectedStatusIbu = elStatusIbu
+      ? HSSelect.getInstance(elStatusIbu, true)
+      : null;
+    const selectedStatusAyah = elStatusAyah
+      ? HSSelect.getInstance(elStatusAyah, true)
+      : null;
+    if (selectedStatusIbu) {
+      selectedStatusIbu.element.setValue(values.status || "");
+    }
+    if (selectedStatusAyah) {
+      selectedStatusAyah.element.setValue(values.status || "");
+    }
+    const elSchoolYear = document.getElementById("schoolYear");
+    const selectedSchoolYear = elSchoolYear
+      ? HSSelect.getInstance(elSchoolYear, true)
+      : null;
+    if (selectedSchoolYear) {
+      selectedSchoolYear.element.setValue(values.schoolYear || "");
+    }
+    const elSemester = document.getElementById("semester");
+    const selectedSemester = elSemester
+      ? HSSelect.getInstance(elSemester, true)
+      : null;
+    if (selectedSemester) {
+      selectedSemester.element.setValue(values.semester || "");
+    }
+    const elSchoolId = document.getElementById("schoolId");
+    const selectedSchoolId = elSchoolId
+      ? HSSelect.getInstance(elSchoolId, true)
+      : null;
+    if (selectedSchoolId) {
+      selectedSchoolId.element.setValue(values.schoolId || "");
+    }
+    const elClassId = document.getElementById("classId");
+    const selectedClassId = elClassId
+      ? HSSelect.getInstance(elClassId, true)
+      : null;
+    if (selectedClassId) {
+      selectedClassId.element.setValue(values.classId || "");
+    }
+  }, [
+    values.education,
+    values.gender,
+    values.relation,
+    values.jobTypeId,
+    values.income,
+    values.status,
+    values.schoolYear,
+    values.semester,
+    values.schoolId,
+    values.classId,
+  ]);
 
   React.useEffect(() => {
     if (isComplete) return;
@@ -623,8 +649,6 @@ const Family = () => {
 
     return () => clearInterval(interval);
   }, [user]);
-
-  console.log(values);
 
   return (
     <div>

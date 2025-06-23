@@ -26,7 +26,7 @@ const TableClasses = ({ children, handleDelete, handleEdit }) => {
     return response.data;
   };
 
-  const { data, isLoading } = useSWR(["classes", keyword, page], () =>
+  const { data, isLoading, mutate } = useSWR(["classes", keyword, page], () =>
     classes()
   );
 
@@ -93,6 +93,10 @@ const TableClasses = ({ children, handleDelete, handleEdit }) => {
     setKeyword(query);
     mutate("classes", { revalidate: true });
   };
+
+  React.useEffect(() => {
+    mutate();
+  }, [keyword, page, mutate]);
 
   return (
     <div className="flex flex-col">

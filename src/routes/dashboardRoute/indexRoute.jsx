@@ -1,7 +1,7 @@
-import React from "react";
 import adminRoute from "./adminRoute";
 import schoolRoute from "./schoolRoute";
 import parentRoute from "./parentRoute";
+import healthcareRoute from "./healthcareRoute";
 
 const indexRoute = () => {
   return (
@@ -9,6 +9,7 @@ const indexRoute = () => {
       {adminRoute()}
       {schoolRoute()}
       {parentRoute()}
+      {healthcareRoute()}
     </>
   );
 };

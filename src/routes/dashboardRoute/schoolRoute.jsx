@@ -5,6 +5,7 @@ import TeacherPage from "../../pages/dashboard/school/teachers";
 import ClassesPage from "../../pages/dashboard/school/Classes";
 import ProtectedRoute from "../guardsRoute/protectedRoute";
 import Question from "../../pages/dashboard/school/Question";
+import Students from "../../pages/dashboard/school/Students";
 
 const schoolRoute = () => {
   return (
@@ -24,6 +25,7 @@ const schoolRoute = () => {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="management-teachers" element={<TeacherPage />} />
         <Route path="management-classes" element={<ClassesPage />} />
+        <Route path="management-students" element={<Students />} />
         <Route path="quesioner" element={<Question />} />
       </Route>
     </>

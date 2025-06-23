@@ -5,10 +5,12 @@ import {
   MdQuestionAnswer,
 } from "react-icons/md";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
-import { RiUserSettingsFill } from "react-icons/ri";
+import { RiUserSettingsFill, RiChatHistoryFill } from "react-icons/ri";
 import { HiMiniBuildingOffice } from "react-icons/hi2";
 import { BsBuildingFillGear } from "react-icons/bs";
-import { IoNutrition } from "react-icons/io5";
+import { IoNutrition, IoBook } from "react-icons/io5";
+import { PiStudentFill } from "react-icons/pi";
+import { IoIosMedkit } from "react-icons/io";
 
 const SidebarItemAdmin = [
   {
@@ -64,6 +66,12 @@ const SidebarItemSchool = [
   },
   {
     id: 4,
+    name: "Manajemen Murid",
+    icon: <PiStudentFill className="w-4 h-4" />,
+    path: "/school/management-students",
+  },
+  {
+    id: 5,
     name: "Pertanyaan",
     icon: <MdQuestionAnswer className="w-4 h-4" />,
     path: "/school/quesioner",
@@ -97,6 +105,33 @@ const SidebarItemParent = [
   },
 ];
 
+const SidebarItemHealthCare = [
+  {
+    id: 1,
+    name: "Dashboard",
+    icon: <TbLayoutDashboardFilled className="w-4 h-4" />,
+    path: "/healthcare/dashboard",
+  },
+  {
+    id: 2,
+    name: "Daftar Rekomendasi",
+    icon: <IoBook className="w-4 h-4" />,
+    path: "/healthcare/list-of-recommendations",
+  },
+  {
+    id: 3,
+    name: "Tindak Lanjut",
+    icon: <IoIosMedkit className="w-4 h-4" />,
+    path: "/healthcare/follow-up",
+  },
+  {
+    id: 4,
+    name: "Riwayat Penanganan",
+    icon: <RiChatHistoryFill className="w-4 h-4" />,
+    path: "/healthcare/treatment-history",
+  },
+];
+
 const Sidebar = () => {
   const location = useLocation();
 
@@ -110,6 +145,9 @@ const Sidebar = () => {
       break;
     case location.pathname.startsWith("/parent"):
       sidebarItems = SidebarItemParent;
+      break;
+    case location.pathname.startsWith("/healthcare"):
+      sidebarItems = SidebarItemHealthCare;
       break;
     default:
       sidebarItems = [];

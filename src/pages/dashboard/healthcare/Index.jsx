@@ -1,7 +1,9 @@
+import React from "react";
+
 const Index = () => {
   return (
     <div>
-      <h1>TEST</h1>
+      <h1>Dashboard</h1>
     </div>
   );
 };
