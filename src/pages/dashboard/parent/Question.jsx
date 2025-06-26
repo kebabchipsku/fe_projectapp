@@ -300,14 +300,14 @@ const Question = () => {
                           } else if (currentQuestion.type === "BOOLEAN") {
                             newAnswers[currentIndex] = {
                               questionId: parseInt(currentQuestion.id),
-                              optionId: opt.id,
+                              option_id: opt.id,
                               score: opt.score,
                               boolean_value: Boolean(opt.score),
                             };
                           } else if (currentQuestion.type === "SCALE") {
                             newAnswers[currentIndex] = {
                               questionId: parseInt(currentQuestion.id),
-                              optionId: opt.id,
+                              option_id: opt.id,
                               score: opt.score,
                               scaleValue: opt.score,
                             };

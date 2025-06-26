@@ -29,10 +29,10 @@ export const useResponses = () => {
           render(response) {
             return response.data.message;
           },
-          onClose: () => {
-            HSOverlay.close(`#hs-vertically-centered-modal-${id}`);
-            window.location.reload();
-          },
+          // onClose: () => {
+          //   HSOverlay.close(`#hs-vertically-centered-modal-${id}`);
+          //   window.location.reload();
+          // },
         },
       }
     );
@@ -62,10 +62,10 @@ export const useResponses = () => {
           render(response) {
             return response.data.message;
           },
-          onClose: () => {
-            HSOverlay.close(`#hs-vertically-centered-modal-${id}`);
-            window.location.reload();
-          },
+          // onClose: () => {
+          //   HSOverlay.close(`#hs-vertically-centered-modal-${id}`);
+          //   window.location.reload();
+          // },
         },
       }
     );
