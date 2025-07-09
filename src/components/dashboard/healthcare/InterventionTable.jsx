@@ -6,6 +6,7 @@ import useSWR from "swr";
 import Pagination from "../../Pagination";
 import {
   deleteIntervention,
+  getInterventionBelongsToFamily,
   getInterventionBelongsToInstitution,
   getRecommendations,
 } from "../../../lib/recommendationAPI";
@@ -27,11 +28,11 @@ const TABLE_HEAD = [
   "Aksi",
 ];
 
-const InterventionTable = () => {
+const InterventionTable = ({ forWho }) => {
   const [page, setPage] = React.useState(0);
   const [limit, setLimit] = React.useState(10);
   const [pages, setPages] = React.useState(0);
-  const [rows, setRows] = React.useState(0);
+  const [rows, setRows] = React.useState(10);
   const [keyword, setKeyword] = React.useState("");
   const [query, setQuery] = React.useState("");
   const [selectedRec, setSelectedRec] = React.useState(null);
@@ -40,8 +41,20 @@ const InterventionTable = () => {
   const { accessToken } = useAuth();
 
   const fetchIntervention = async () => {
-    const data = await getInterventionBelongsToInstitution(accessToken);
-    return data.data;
+    console.log({ forWho });
+    let fetchFunction =
+      forWho === "PARENT"
+        ? getInterventionBelongsToFamily
+        : getInterventionBelongsToInstitution;
+    const data = await fetchFunction(accessToken, {
+      page,
+      limit,
+      keyword: query,
+    });
+    setLimit(data.data.limit);
+    setPages(data.data.totalPages);
+
+    return data.data.interventions;
   };
 
   const {
@@ -50,23 +63,15 @@ const InterventionTable = () => {
     mutate,
   } = useSWR("institutionInterventions", () => fetchIntervention());
 
-  // const handleDelete = async (id) => {
-  //   try {
-  //     const data = await deleteIntervention(id);
-  //     console.log("deleted: " + id);
-  //     mutate();
-  //     toast.success("Intervensi berhasil dihapus", { autoClose: 1000 });
-  //   } catch (err) {
-  //     console.log({ err });
-  //     toast.error(err.message, { autoClose: 500 });
-  //   }
-  // };
-
   useEffect(() => {
     if (!isLoading) {
       HSStaticMethods.autoInit();
     }
   }, [interventionData]);
+
+  useEffect(() => {
+    mutate();
+  }, [query]);
 
   if (isLoading) {
     tableContent = [...Array(10)].map((_, index) => (
@@ -85,7 +90,7 @@ const InterventionTable = () => {
         ? JSON.parse(intervention.options)
         : "";
       const content = parsedContent.content;
-      console.log({ content, parsedContent });
+      console.log({ interventionFETECETETE: intervention });
 
       return (
         <tr key={intervention.id}>
@@ -169,6 +174,7 @@ const InterventionTable = () => {
                       values={intervention.recommendation}
                       content={parsedContent?.content ?? ""}
                       signature={parsedContent?.signature ?? ""}
+                      institution={intervention?.user}
                     />
                   </div>
                 </div>
@@ -211,7 +217,7 @@ const InterventionTable = () => {
                     name="search_query"
                     id="search_query"
                     className="py-1.5 sm:py-2 px-3 ps-9 block w-full border border-obito-grey shadow-2xs rounded-lg sm:text-sm focus:z-10 focus:border-blue-800 focus:ring-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                    placeholder="Username atau Email"
+                    placeholder="Nama siswa"
                   />
                   <div className="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-3">
                     <svg

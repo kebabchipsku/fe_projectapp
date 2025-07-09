@@ -112,8 +112,12 @@ function renderTextNode(node, index) {
   );
 }
 
-export default function Index({ values, content, signature }) {
-  console.log({ values });
+export default function Index({
+  values,
+  content,
+  signature,
+  institution: { institution, username },
+}) {
   if (!values) return null;
   const { user, accessToken } = useAuth();
 
@@ -157,7 +161,8 @@ export default function Index({ values, content, signature }) {
     return "-";
   };
 
-  console.log(values.submittedBy?.institution?.name);
+  console.log(JSON.stringify(institution));
+
   return (
     <PDFViewer width="100%" height={640}>
       <Document>
@@ -175,17 +180,24 @@ export default function Index({ values, content, signature }) {
           <View style={styles.cop}>
             <Text style={styles.copTextTitle}>Dinas Kesehatan</Text>
             <Text style={styles.copTextSubTitle}>
-              UPT Puskesmas {currentUser?.institution?.name ?? "-"}
-              {/* {recommendation?.student?.institution?.name} */}
+              UPT{" "}
+              {institution
+                ? institution.name
+                : currentUser?.institution?.name ?? "-"}
             </Text>
             <Text style={styles.copTextSubTitle}>
-              {/* {recommendation?.student?.institution?.address} */}
-              {currentUser?.institution?.address ?? "-"}
+              {institution
+                ? institution.address
+                : currentUser?.institution?.address ?? "-"}
             </Text>
             <Text style={styles.copTextContent}>
-              {/* {recommendation?.student?.institution?.phone} |{" "} */}
-              {/* {recommendation?.student?.institution?.email} */}
-              Email: {currentUser?.email ?? "-"}
+              {institution
+                ? institution.phone
+                : currentUser?.institution?.phone ?? "-"}
+              |{" "}
+              {institution
+                ? institution.email
+                : currentUser?.institution?.email ?? "-"}
             </Text>
             <Text style={styles.copBorderBottom}></Text>
           </View>
@@ -273,7 +285,7 @@ export default function Index({ values, content, signature }) {
               {signature && <Image src={signature} style={styles.image} />}
             </View>
             <Text style={styles.signatureName}>
-              {currentUser?.name ?? currentUser?.username ?? "-"}
+              {institution ? username : currentUser?.username ?? "-"}
             </Text>
           </View>
         </Page>

@@ -5,6 +5,7 @@ import Family from "../../pages/dashboard/parent/Family";
 import Question from "../../pages/dashboard/parent/Question";
 import FamilyMemberGuard from "../guardsRoute/FamilyMemberGuard";
 import ProtectedRoute from "../guardsRoute/ProtectedRoute";
+import History from "../../pages/dashboard/healthcare/History";
 
 const parentRoute = () => {
   return (
@@ -25,6 +26,8 @@ const parentRoute = () => {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="management-family" element={<Family />} />
           <Route path="quesioner" element={<Question />} />
+
+          <Route path="recomendation" element={<History forWho="PARENT" />} />
         </Route>
       </Route>
     </>

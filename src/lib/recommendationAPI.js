@@ -78,13 +78,19 @@ export const getSingleRecommendation = async (id) => {
   }
 };
 
-export const getInterventionBelongsToInstitution = async (token) => {
+export const getInterventionBelongsToInstitution = async (
+  token,
+  filter = {}
+) => {
   try {
     const response = await axios.get(
       `${import.meta.env.VITE_BASE_URL}interventions/institutions`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
+        },
+        params: {
+          ...filter,
         },
       }
     );
@@ -99,6 +105,26 @@ export const deleteIntervention = async (id) => {
   try {
     const response = await axios.delete(
       `${import.meta.env.VITE_BASE_URL}interventions/${id}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log("error:", error);
+    throw error.response?.data ?? error.message;
+  }
+};
+
+export const getInterventionBelongsToFamily = async (token, filter = {}) => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}interventions/families`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          ...filter,
+        },
+      }
     );
     return response.data;
   } catch (error) {
