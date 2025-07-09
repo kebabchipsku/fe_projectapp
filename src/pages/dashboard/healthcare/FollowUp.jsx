@@ -1,16 +1,27 @@
-import React from "react";
-import Intervensi from "../../../components/dashboard/healthcare/FollowUpLetter/Index";
-import TableQuestion from "../../../components/dashboard/healthcare/TableQuestion";
+import Placeholder from "@tiptap/extension-placeholder";
+import { Color } from "@tiptap/extension-color";
+import ListItem from "@tiptap/extension-list-item";
+import TextStyle from "@tiptap/extension-text-style";
+import { EditorProvider } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import { useFormik } from "formik";
-import { getRecommendations } from "../../../lib/recommendationAPI";
-import useSWR from "swr";
 import { HSSelect, HSStaticMethods } from "preline/preline";
-import { getQuesioners } from "../../../lib/quesionersAPI";
+import React, { useState, useEffect } from "react";
+import useSWR from "swr";
+import Editor, {
+  MenuBar,
+} from "../../../components/dashboard/healthcare/Editor";
+import Modal from "../../../components/dashboard/healthcare/Modal";
+import TableQuestion from "../../../components/dashboard/healthcare/TableQuestion";
 import {
   showResponseForInstitution,
   showResponseForParent,
 } from "../../../lib/parent/responseAPI";
-import Editor from "../../../components/dashboard/healthcare/Editor";
+import { getQuesioners } from "../../../lib/quesionersAPI";
+import {
+  getRecommendations,
+  getSingleRecommendation,
+} from "../../../lib/recommendationAPI";
 
 const TABLE_HEAD = ["No", "Pertanyaan", "Jawaban"];
 
@@ -24,6 +35,7 @@ const FollowUp = () => {
   const [loadingParent, setLoadingParent] = React.useState({});
   const [loadingSchool, setLoadingSchool] = React.useState({});
   const schoolRef = React.useRef(null);
+  const [imgUrl, setImgUrl] = React.useState(null);
 
   const { values, setFieldValue } = useFormik({
     initialValues: {
@@ -131,6 +143,9 @@ const FollowUp = () => {
     }
   }, [quesionerSchoolData, values.school, keyword, page, limit]);
 
+  const [selectedRecommendationData, setSelectedRecommendationData] =
+    React.useState(null);
+
   const students = async () => {
     const response = await getRecommendations();
     const filteredData = {
@@ -158,6 +173,7 @@ const FollowUp = () => {
     const rec = recommendationData?.recomend.find(
       (r) => r?.student?.familyMember?.familyId === familyId
     );
+    setSelectedRecommendationData(rec);
     return rec?.student?.institution?.id?.toString() || "";
   };
 
@@ -189,12 +205,73 @@ const FollowUp = () => {
       newLabel.setAttribute("for", "student");
       newLabel.className = "block text-sm font-medium mb-2";
       newLabel.textContent = "Murid";
+      if (!select) {
+        return;
+      }
       select.parentNode.insertBefore(newLabel, select);
       HSStaticMethods.autoInit();
     }, 100);
   }, [values.school]);
 
-  console.log(values);
+  const [content, setContent] = useState("");
+
+  const extensions = [
+    Color.configure({ types: [TextStyle.name, ListItem.name] }),
+    TextStyle.configure({ types: [ListItem.name] }),
+    StarterKit.configure({
+      bulletList: {
+        keepMarks: true,
+        keepAttributes: false,
+      },
+      orderedList: {
+        keepMarks: true,
+        keepAttributes: false,
+      },
+      heading: {
+        levels: [1, 2, 3, 4, 5, 6],
+      },
+    }),
+    Placeholder.configure({
+      placeholder: "Tulis rekomendasi disini",
+      emptyNodeClass: "text-gray-400 dark:text-neutral-100",
+    }),
+  ];
+
+  // const [recommendation, setRecommendation] = useState(null);
+
+  const fetchRecommendationWithUserData = async () => {
+    console.log("Fetching ....");
+    if (!selectedRecommendationData) {
+      console.log("ID belum tersedia");
+      return null;
+    }
+    const recommendation = await getSingleRecommendation(
+      selectedRecommendationData.id
+    );
+    return recommendation.data;
+  };
+
+  const {
+    data: recommendation,
+    mutate,
+    isLoading,
+    error,
+  } = useSWR(
+    selectedRecommendationData?.id
+      ? `singleRecommendation-${selectedRecommendationData.id}`
+      : null,
+    fetchRecommendationWithUserData,
+    { onError: (err) => console.log({ err }) }
+  );
+
+  console.log({ isLoading, error, recommendation });
+
+  useEffect(() => {
+    if (!selectedRecommendationData) {
+      return;
+    }
+    mutate();
+  }, [selectedRecommendationData]);
 
   return (
     <div className="flex flex-col space-y-4">
@@ -463,8 +540,34 @@ const FollowUp = () => {
           </div>
         </div>
       </div>
-      <Editor />
-      <Intervensi />
+      <div>
+        <div className="text-lg">
+          <h1 className="font-bold ">Rekomendasi</h1>
+          <EditorProvider
+            content={content}
+            extensions={extensions}
+            slotBefore={<MenuBar />}
+            editorContainerProps={{
+              className: "border p-4 border-gray-400 rounded-md ",
+            }}
+          >
+            <Editor
+              selectedRecommendationData={selectedRecommendationData}
+              content={content}
+              setContent={setContent}
+              imgUrl={imgUrl}
+              setImgUrl={setImgUrl}
+            >
+              <Modal
+                content={content}
+                values={recommendation ?? ""}
+                setContent={setContent}
+                signature={imgUrl}
+              />
+            </Editor>
+          </EditorProvider>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,7 +1,6 @@
 import { Navigate, Route } from "react-router-dom";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import DashboardPage from "../../pages/dashboard/admin/Index";
-import ProtectedRoute from "../guardsRoute/protectedRoute";
 import Institution from "../../pages/dashboard/admin/Institution";
 import Users from "../../pages/dashboard/admin/Users";
 import Category from "../../pages/dashboard/admin/Category";
@@ -10,6 +9,7 @@ import BalancedNutritionKnowledgeLevel from "../../pages/dashboard/admin/Questio
 import ChildrensDailyHabits from "../../pages/dashboard/admin/Questions/ChildrensDailyHabits";
 import HealthServiceofSchool from "../../pages/dashboard/admin/Questions/HealthServiceofSchool";
 import SchoolEnvironment from "../../pages/dashboard/admin/Questions/SchoolEnvironment";
+import ProtectedRoute from "../guardsRoute/ProtectedRoute";
 
 const adminRoute = () => {
   return (

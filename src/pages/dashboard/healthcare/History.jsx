@@ -1,9 +1,10 @@
 import React from "react";
+import InterventionTable from "../../../components/dashboard/healthcare/InterventionTable";
 
-const History = () => {
+const History = ({ forWho = "INSTITUTION" }) => {
   return (
     <div>
-      <h1>History</h1>
+      <InterventionTable forWho={forWho} />
     </div>
   );
 };

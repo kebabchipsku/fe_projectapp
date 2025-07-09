@@ -33,3 +33,17 @@ export const dropUser = async (id, token) => {
     throw error.response?.data;
   }
 };
+
+export const getUserById = async (id, token) => {
+  try {
+    const response = await api.get(`users/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log({ data: response.data });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
