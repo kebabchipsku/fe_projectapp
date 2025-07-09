@@ -3,9 +3,9 @@ import DashboardLayout from "../../layouts/DashboardLayout";
 import DashboardPage from "../../pages/dashboard/school/index";
 import TeacherPage from "../../pages/dashboard/school/teachers";
 import ClassesPage from "../../pages/dashboard/school/Classes";
-import ProtectedRoute from "../guardsRoute/protectedRoute";
 import Question from "../../pages/dashboard/school/Question";
 import Students from "../../pages/dashboard/school/Students";
+import ProtectedRoute from "../guardsRoute/ProtectedRoute";
 
 const schoolRoute = () => {
   return (

@@ -1,5 +1,5 @@
 import { Navigate, Route } from "react-router-dom";
-import ProtectedRoute from "../guardsRoute/protectedRoute";
+import ProtectedRoute from "../guardsRoute/ProtectedRoute";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import DashboardPage from "../../pages/dashboard/healthcare/Index";
 import Recommendation from "../../pages/dashboard/healthcare/Recommendation";

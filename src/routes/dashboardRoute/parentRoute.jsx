@@ -1,10 +1,10 @@
 import { Navigate, Route } from "react-router-dom";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import DashboardPage from "../../pages/dashboard/parent/Index";
-import ProtectedRoute from "../guardsRoute/protectedRoute";
 import Family from "../../pages/dashboard/parent/Family";
 import Question from "../../pages/dashboard/parent/Question";
 import FamilyMemberGuard from "../guardsRoute/FamilyMemberGuard";
+import ProtectedRoute from "../guardsRoute/ProtectedRoute";
 
 const parentRoute = () => {
   return (
