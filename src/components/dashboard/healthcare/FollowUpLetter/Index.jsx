@@ -121,6 +121,7 @@ export default function Index({
   if (!values && !institution) return null;
   let institut = null;
   let username = "-";
+
   if (institution) {
     institut = institution?.institution;
     username = institution?.username;
@@ -277,7 +278,7 @@ export default function Index({
               {signature && <Image src={signature} style={styles.image} />}
             </View>
             <Text style={styles.signatureName}>
-              {institut ? username : currentUser?.username ?? "-"}
+              {username ? username : currentUser?.username ?? "-"}
             </Text>
           </View>
         </Page>

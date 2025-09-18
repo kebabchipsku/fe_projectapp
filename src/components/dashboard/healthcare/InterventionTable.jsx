@@ -1,22 +1,15 @@
+import { HSStaticMethods } from "preline/preline";
 import React, { useEffect } from "react";
 import { FaEye } from "react-icons/fa6";
-import { FaTrashAlt } from "react-icons/fa";
-import { HSStaticMethods } from "preline/preline";
 import useSWR from "swr";
-import Pagination from "../../Pagination";
+import { useAuth } from "../../../hooks/auth/useAuth";
 import {
-  deleteIntervention,
   getInterventionBelongsToFamily,
   getInterventionBelongsToInstitution,
-  getRecommendations,
 } from "../../../lib/recommendationAPI";
-import Surat from "./DetailLetter/Index";
-import { getParentFamilyMember } from "../../../lib/parent/familiesAPI";
-import { useRecommendation } from "../../../hooks/useRecommendation";
-import { useAuth } from "../../../hooks/auth/useAuth";
 import { getCurrrentDate } from "../../../lib/utility";
+import Pagination from "../../Pagination";
 import Intervensi from "./FollowUpLetter/Index";
-import { toast } from "react-toastify";
 
 const TABLE_HEAD = [
   "NIS",
@@ -41,7 +34,6 @@ const InterventionTable = ({ forWho }) => {
   const { accessToken } = useAuth();
 
   const fetchIntervention = async () => {
-    console.log({ forWho });
     let fetchFunction =
       forWho === "PARENT"
         ? getInterventionBelongsToFamily
@@ -90,7 +82,6 @@ const InterventionTable = ({ forWho }) => {
         ? JSON.parse(intervention.options)
         : "";
       const content = parsedContent.content;
-      console.log({ interventionFETECETETE: intervention });
 
       return (
         <tr key={intervention.id}>
@@ -169,7 +160,6 @@ const InterventionTable = ({ forWho }) => {
                     </button>
                   </div>
                   <div id="surat" className="p-6 h-full">
-                    <h1>Surat</h1>
                     <Intervensi
                       values={intervention.recommendation}
                       content={parsedContent?.content ?? ""}

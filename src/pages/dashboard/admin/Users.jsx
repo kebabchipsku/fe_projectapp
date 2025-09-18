@@ -8,7 +8,8 @@ import { getProvinces } from "../../../lib/provinceAPI";
 import { getInstitutionType } from "../../../lib/institutionsAPI";
 import { useAuth } from "../../../hooks/auth/useAuth";
 import { HSStaticMethods } from "preline/preline";
-
+import { FaPlus } from "react-icons/fa";
+import ModalContainer from "../../../components/Modal";
 const Users = () => {
   React.useEffect(() => {
     HSStaticMethods.autoInit();
@@ -30,6 +31,9 @@ const Users = () => {
     const response = await getInstitutionType();
     return response.data;
   };
+
+  const [isAddProvince, setIsAddProvince] = useState(false);
+  const [isAddCity, setIsAddCity] = useState(false);
 
   const { handleChange, handleBlur, handleSubmit, setFieldValue, resetForm } =
     useFormik({
@@ -78,6 +82,7 @@ const Users = () => {
 
   return (
     <div>
+      <ModalContainer title={"Tambah Provinsi"} isOpen={isAddCity} />
       <Table>
         <form onSubmit={handleSubmit}>
           <div className="p-4">
@@ -161,13 +166,18 @@ const Users = () => {
                   >
                     Provinsi Instansi
                   </label>
-                  <select
-                    id="institutionProvince"
-                    name="institutionProvince"
-                    onChange={(event) =>
-                      setFieldValue("institutionProvince", event.target.value)
-                    }
-                    data-hs-select='{
+                  <div className="flex justify-between gap-2">
+                    <div className="flex-1">
+                      <select
+                        id="institutionProvince"
+                        name="institutionProvince"
+                        onChange={(event) =>
+                          setFieldValue(
+                            "institutionProvince",
+                            event.target.value
+                          )
+                        }
+                        data-hs-select='{
                     "placeholder": "Pilih Provinsi...",
                     "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
                     "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-800",
@@ -176,15 +186,23 @@ const Users = () => {
                     "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"shrink-0 size-3.5 text-blue-600 dark:text-blue-500 \" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
                     "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"shrink-0 size-3.5 text-gray-500 dark:text-neutral-500 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
                   }'
-                    className="hidden"
-                  >
-                    <option value="">Pilih Provinsi</option>
-                    {provinces.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
+                        className="hidden"
+                      >
+                        <option value="">Pilih Provinsi</option>
+                        {provinces.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <button
+                      type="button"
+                      class="px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                    >
+                      <FaPlus />
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className="flex gap-5">

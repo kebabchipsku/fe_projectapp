@@ -36,7 +36,7 @@ const Index = () => {
       (async () => {
         try {
           const { data } = await getDashboardSummary(accessToken);
-          console.log({ data });
+          console.log({ sumary: data });
           if (!!data?.summary?.childrens.length) {
             setChildren(data?.summary?.childrens[0]);
           }
@@ -79,7 +79,6 @@ const Index = () => {
       const filteredChildren = dataSummary.summary.childNutritionGrowth.find(
         (child) => child.id === children.id
       );
-      console.log({ filteredChildren });
       setChildNutritionGrowth(
         filteredChildren.nutrition.map((nutrition) => ({
           ...nutrition,
