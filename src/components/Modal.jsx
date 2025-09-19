@@ -7,7 +7,7 @@ function ModalContainer({ isOpen, onClose, children, title }) {
 
   return (
     <div
-      className={`fixed inset-0 transition-all bg-[rgba(0,0,0,0.3)] flex items-center justify-center z-50 `}
+      className={`fixed inset-0 transition-all bg-[rgba(0,0,0,0.3)] flex items-center justify-center z-[999]`}
       onClick={onClose}
     >
       <div

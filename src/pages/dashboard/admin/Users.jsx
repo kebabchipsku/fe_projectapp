@@ -1,20 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import Table from "../../../components/dashboard/admin/Table";
 import FormAddUser from "../../../components/FormAddDouble";
 import useSWR from "swr";
 import { useFormik } from "formik";
-import { getCities } from "../../../lib/cityAPI";
+import { addCity, addProvince, getCities } from "../../../lib/cityAPI";
 import { getProvinces } from "../../../lib/provinceAPI";
 import { getInstitutionType } from "../../../lib/institutionsAPI";
 import { useAuth } from "../../../hooks/auth/useAuth";
 import { HSStaticMethods } from "preline/preline";
 import { FaPlus } from "react-icons/fa";
 import ModalContainer from "../../../components/Modal";
+import { capitalizeText } from "../../../lib/utility";
+import { toast } from "react-toastify";
 const Users = () => {
-  React.useEffect(() => {
-    HSStaticMethods.autoInit();
-  }, []);
-
   const { registerInstitution } = useAuth();
 
   const province = async () => {
@@ -75,6 +73,70 @@ const Users = () => {
   const { data: provinces } = useSWR("provinces", province);
   const { data: cities } = useSWR("cities", city);
   const { data: institutions } = useSWR("institutionType", institution);
+  const [newProvince, setNewProvince] = useState("");
+  const [newCity, setNewCity] = useState("");
+  const { accessToken } = useAuth();
+  const [selectedProvinceId, setSelectedProvinceId] = useState(null);
+
+  const addNewProvince = async (newProvince) => {
+    try {
+      if (!newProvince) {
+        throw new Error("Isi provinsi terlebih dahulu");
+      }
+      const capitalizeProvince = capitalizeText(newProvince);
+      const { data } = await addProvince(capitalizeProvince, accessToken);
+
+      setNewProvince("");
+      toast.success("Provinsi berhasil ditambahkan", {
+        onClose: () => {
+          window.location.reload();
+        },
+      });
+    } catch (err) {
+      console.log({ err });
+      toast.error(`Gagal menambahkan provinsi: ${err.messsage}`);
+    }
+  };
+
+  const addNewCity = async (provinceId, newCity) => {
+    try {
+      if (!newCity) {
+        throw new Error("Isi kota terlebih dahulu");
+      }
+
+      const capitalizeCity = capitalizeText(newCity);
+      if (cities) {
+        const isDuplicate = cities.some((city) => city.name === capitalizeText);
+        if (isDuplicate) {
+          toast.error(`Kota sudah ada`);
+          return;
+        }
+        const isExists = cities.some(
+          (city) =>
+            city.name === capitalizeCity && city.province_id === provinceId
+        );
+        if (isExists) {
+          toast.error(`Kota sudah ada`);
+          return;
+        }
+      }
+      const { data } = await addCity(provinceId, capitalizeCity, accessToken);
+
+      setNewCity("");
+      toast.success("Kota berhasil ditambahkan", {
+        onClose: () => {
+          window.location.reload();
+        },
+      });
+    } catch (err) {
+      console.log({ err });
+      toast.error(`Gagal menambahkan Kota: ${err.message}`);
+    }
+  };
+
+  React.useEffect(() => {
+    HSStaticMethods.autoInit();
+  }, [isAddCity]);
 
   if (!provinces) return <div>Loading...</div>;
   if (!cities) return <div>Loading...</div>;
@@ -82,7 +144,99 @@ const Users = () => {
 
   return (
     <div>
-      <ModalContainer title={"Tambah Provinsi"} isOpen={isAddCity} />
+      <ModalContainer
+        title={"Tambah Provinsi"}
+        isOpen={isAddProvince}
+        onClose={() => setIsAddProvince(false)}
+      >
+        <div className="max-w-full">
+          <label
+            htmlFor="input-province"
+            className="block text-sm font-medium mb-2 dark:text-white"
+          >
+            Nama Provinsi
+          </label>
+          <input
+            type="text"
+            id="input-province"
+            className="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+            placeholder="Jawa Barat"
+            value={newProvince}
+            onChange={(e) => setNewProvince(e.target.value)}
+          />
+        </div>
+        <button
+          type="button"
+          className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none justify-center"
+          onClick={() => addNewProvince(newProvince)}
+        >
+          Submit
+        </button>
+      </ModalContainer>
+
+      <ModalContainer
+        title={"Tambah Kota"}
+        isOpen={isAddCity}
+        onClose={() => setIsAddCity(false)}
+      >
+        <div>
+          <label
+            htmlFor="institutionProvince"
+            className="block text-sm font-medium mb-2 dark:text-white"
+          >
+            Pilih Provinsi
+          </label>
+          <select
+            id="institutionProvince"
+            name="institutionProvince"
+            onChange={(event) =>
+              setSelectedProvinceId(Number(event.target.value))
+            }
+            data-hs-select='{
+                    "placeholder": "Pilih Provinsi...",
+                    "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
+                    "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-800",
+                    "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300",
+                    "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50",
+                    "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"shrink-0 size-3.5 text-blue-600 dark:text-blue-500 \" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
+                    "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"shrink-0 size-3.5 text-gray-500 dark:text-neutral-500 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>",
+                    "hasSearch": true
+                  }'
+            className="hidden"
+          >
+            <option value="">Pilih Provinsi</option>
+            {provinces.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div class="">
+          <label
+            for="input-city"
+            class="block text-sm font-medium mb-2 dark:text-white"
+          >
+            Nama Kota
+          </label>
+          <input
+            type="text"
+            id="input-city"
+            class="py-2.5 sm:py-3 px-4 block border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 w-full "
+            placeholder="Bandung"
+            value={newCity}
+            onChange={(e) => setNewCity(e.target.value)}
+          />
+        </div>
+        <button
+          type="button"
+          className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none justify-center"
+          onClick={() => addNewCity(selectedProvinceId, newCity)}
+        >
+          Submit
+        </button>
+      </ModalContainer>
+
       <Table>
         <form onSubmit={handleSubmit}>
           <div className="p-4">
@@ -199,6 +353,7 @@ const Users = () => {
                     <button
                       type="button"
                       class="px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                      onClick={() => setIsAddProvince(true)}
                     >
                       <FaPlus />
                     </button>
@@ -213,13 +368,15 @@ const Users = () => {
                   >
                     Kota Instansi
                   </label>
-                  <select
-                    id="institutionCity"
-                    name="institutionCity"
-                    onChange={(event) =>
-                      setFieldValue("institutionCity", event.target.value)
-                    }
-                    data-hs-select='{
+                  <div className="flex justify-between gap-2 ">
+                    <div className=" w-full">
+                      <select
+                        id="institutionCity"
+                        name="institutionCity"
+                        onChange={(event) =>
+                          setFieldValue("institutionCity", event.target.value)
+                        }
+                        data-hs-select='{
                     "hasSearch": true,
                     "searchPlaceholder": "Cari...",
                     "searchClasses": "block w-full sm:text-sm border-gray-200 rounded-lg focus:border-blue-800 focus:ring-blue-800 before:absolute before:inset-0 before:z-1 py-1.5 sm:py-2 px-3",
@@ -232,15 +389,24 @@ const Users = () => {
                     "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"shrink-0 size-3.5 text-blue-600 \" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
                     "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"shrink-0 size-3.5 text-gray-500 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
                   }'
-                    className="hidden"
-                  >
-                    <option value="">Pilih Kota</option>
-                    {cities.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
+                        className="hidden"
+                      >
+                        <option value="">Pilih Kota</option>
+                        {cities.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <button
+                      type="button"
+                      class="px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                      onClick={() => setIsAddCity(true)}
+                    >
+                      <FaPlus />
+                    </button>
+                  </div>
                 </div>
                 <div className="max-w-lg w-full">
                   <label
