@@ -1,13 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../../../components/dashboard/admin/Table";
 import FormAddUser from "../../../components/FormAddDouble";
 import useSWR from "swr";
 import { useFormik } from "formik";
-import { addCity, addProvince, getCities } from "../../../lib/cityAPI";
+import {
+  addCity,
+  addProvince,
+  getCities,
+  getCitiesByProvince,
+} from "../../../lib/cityAPI";
 import { getProvinces } from "../../../lib/provinceAPI";
 import { getInstitutionType } from "../../../lib/institutionsAPI";
 import { useAuth } from "../../../hooks/auth/useAuth";
-import { HSStaticMethods } from "preline/preline";
+import { HSSelect, HSStaticMethods } from "preline/preline";
 import { FaPlus } from "react-icons/fa";
 import ModalContainer from "../../../components/Modal";
 import { capitalizeText } from "../../../lib/utility";
@@ -33,51 +38,83 @@ const Users = () => {
   const [isAddProvince, setIsAddProvince] = useState(false);
   const [isAddCity, setIsAddCity] = useState(false);
 
-  const { handleChange, handleBlur, handleSubmit, setFieldValue, resetForm } =
-    useFormik({
-      initialValues: {
-        username: "",
-        email: "",
-        password: "",
-        role_id: 0,
-        institutionName: "",
-        institutionEmail: "",
-        institutionPhone: "",
-        institutionAddress: "",
-        institutionProvince: 0,
-        institutionCity: 0,
-        institutionType: 0,
-      },
-      onSubmit: async (values) => {
-        let role_id = 0;
-        const institutionType = parseInt(values.institutionType, 10);
+  const {
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    setFieldValue,
+    resetForm,
+    getFieldProps,
+  } = useFormik({
+    initialValues: {
+      username: "",
+      email: "",
+      password: "",
+      role_id: 0,
+      institutionName: "",
+      institutionEmail: "",
+      institutionPhone: "",
+      institutionAddress: "",
+      institutionProvince: 0,
+      institutionCity: 0,
+      institutionType: 0,
+    },
+    onSubmit: async (values) => {
+      let role_id = 0;
+      const institutionType = parseInt(values.institutionType, 10);
 
-        if (institutionType === 1) {
-          role_id = 3;
-        } else if (institutionType === 2) {
-          role_id = 5;
-        }
+      if (institutionType === 1) {
+        role_id = 3;
+      } else if (institutionType === 2) {
+        role_id = 5;
+      }
 
-        const modifiedValues = {
-          ...values,
-          institutionProvince: parseInt(values.institutionProvince, 10),
-          institutionCity: parseInt(values.institutionCity, 10),
-          institutionType,
-          role_id,
-        };
+      const modifiedValues = {
+        ...values,
+        institutionProvince: parseInt(values.institutionProvince, 10),
+        institutionCity: parseInt(values.institutionCity, 10),
+        institutionType,
+        role_id,
+      };
 
-        await registerInstitution(modifiedValues);
-      },
-    });
+      await registerInstitution(modifiedValues);
+    },
+  });
+
+  const institutionProvince = getFieldProps("institutionProvince");
+  console.log({ institutionProvince });
 
   const { data: provinces } = useSWR("provinces", province);
-  const { data: cities } = useSWR("cities", city);
+  const [cities, setCities] = useState([]);
   const { data: institutions } = useSWR("institutionType", institution);
   const [newProvince, setNewProvince] = useState("");
   const [newCity, setNewCity] = useState("");
   const { accessToken } = useAuth();
   const [selectedProvinceId, setSelectedProvinceId] = useState(null);
 
+  useEffect(() => {
+    const provinceId = Number(institutionProvince.value);
+
+    if (provinceId > 0) {
+      (async () => {
+        try {
+          const { data } = await getCitiesByProvince(provinceId);
+          setCities(data);
+        } catch (err) {
+          console.log({ err });
+          setCities([]);
+        }
+      })();
+    } else {
+      setCities([]);
+    }
+  }, [institutionProvince.value]); // <-- Dependensi yang benar
+
+  const handleProvinceChange = (event) => {
+    const provinceId = event.target.value;
+    setFieldValue("institutionProvince", provinceId);
+    setFieldValue("institutionCity", 0); // Reset pilihan kota saat provinsi berubah
+  };
   const addNewProvince = async (newProvince) => {
     try {
       if (!newProvince) {
@@ -136,8 +173,17 @@ const Users = () => {
 
   React.useEffect(() => {
     HSStaticMethods.autoInit();
-  }, [isAddCity]);
+  }, [isAddCity, institutionProvince.value]);
 
+  useEffect(() => {
+    const citySelectElement = document.querySelector("#institutionCity");
+
+    if (citySelectElement) {
+      HSSelect.getInstance(citySelectElement).destroy();
+
+      HSStaticMethods.autoInit();
+    }
+  }, [cities]);
   if (!provinces) return <div>Loading...</div>;
   if (!cities) return <div>Loading...</div>;
   if (!institutions) return <div>Loading...</div>;
@@ -325,12 +371,7 @@ const Users = () => {
                       <select
                         id="institutionProvince"
                         name="institutionProvince"
-                        onChange={(event) =>
-                          setFieldValue(
-                            "institutionProvince",
-                            event.target.value
-                          )
-                        }
+                        onChange={handleProvinceChange}
                         data-hs-select='{
                     "placeholder": "Pilih Provinsi...",
                     "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
@@ -392,11 +433,14 @@ const Users = () => {
                         className="hidden"
                       >
                         <option value="">Pilih Kota</option>
-                        {cities.map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.name}
-                          </option>
-                        ))}
+                        {cities.map((c) => {
+                          console.log({ c });
+                          return (
+                            <option key={c.id} value={c.id}>
+                              {c.name}
+                            </option>
+                          );
+                        })}
                       </select>
                     </div>
                     <button

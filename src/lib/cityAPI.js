@@ -9,6 +9,17 @@ export const getCities = async () => {
   }
 };
 
+export const getCitiesByProvince = async (provinceId) => {
+  try {
+    const response = await api.get(
+      `${import.meta.env.VITE_BASE_URL}provinces/${provinceId}/cities`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
+
 export const addProvince = async (province, token) => {
   try {
     const response = await api.post(
