@@ -22,6 +22,7 @@ import {
   getRecommendations,
   getSingleRecommendation,
 } from "../../../lib/recommendationAPI";
+import { useAuth } from "../../../hooks/auth/useAuth";
 
 const TABLE_HEAD = ["No", "Pertanyaan", "Jawaban"];
 
@@ -145,9 +146,10 @@ const FollowUp = () => {
 
   const [selectedRecommendationData, setSelectedRecommendationData] =
     React.useState(null);
+  const { accessToken } = useAuth();
 
   const students = async () => {
-    const response = await getRecommendations();
+    const response = await getRecommendations(accessToken);
     const filteredData = {
       ...response.data,
       recomend: response.data.recomend.filter(

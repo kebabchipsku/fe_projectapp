@@ -11,6 +11,7 @@ import { getRecommendations } from "../../../lib/recommendationAPI";
 import { getClasses } from "../../../lib/classesAPI";
 import ModalContainer from "../../Modal";
 import { getHealthCares } from "../../../lib/healthcare/healthcare";
+import { toast } from "react-toastify";
 
 const TABLE_HEAD = [
   "Nama Lengkap",
@@ -77,6 +78,7 @@ const TableStudents = () => {
     isLoading: studentLoading,
     mutate: studentMutate,
   } = useSWR(["students", keyword, page, selectedClass], () => Fetchstudents());
+  console.log({ studentData });
 
   const { data: recommendationData } = useSWR("recommendations", Fetchrecomend);
 
@@ -134,7 +136,8 @@ const TableStudents = () => {
       }
     })();
   }, []);
-  console.log({ user });
+
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   if (studentLoading) {
     tableContent = [...Array(10)].map((_, index) => (
@@ -148,108 +151,64 @@ const TableStudents = () => {
       </tr>
     ));
   } else if (studentData && studentData?.students?.length > 0) {
-    tableContent = studentData.students.map((student) => (
-      <tr key={student.id}>
-        <td className="px-6 py-4 capitalize whitespace-nowrap text-sm font-medium text-gray-800">
-          {student?.fullName || "-"}
-        </td>
-        <td className="px-6 py-4 capitalize whitespace-nowrap text-sm font-medium text-gray-800">
-          {student?.student?.nis || "-"}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-          {student?.student?.schoolYear || "-"}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-          {student?.student?.semester || "-"}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap capitalize text-sm text-gray-800">
-          {student?.student?.class?.name || "-"}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap capitalize text-sm text-gray-800">
-          {student?.nutrition[0]?.nutritionStatus?.information || "-"}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-          {(() => {
-            const isNormal =
-              student?.nutrition?.[0]?.nutritionStatus?.information?.toLowerCase() ===
-              "gizi normal";
-            const isRecommended = recommendationData?.recomend?.some(
-              (rec) => rec.student.id === student?.student?.id
-            );
-            // const isRecommended = false;
-            const isDisabled = isNormal || isRecommended;
-            return isRecommended ? (
-              <button
-                type="button"
-                className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none capitalize"
-                disabled={isDisabled}
-              >
-                Sudah di rekomendasikan
-              </button>
-            ) : (
-              <>
+    tableContent = studentData.students.map((student) => {
+      console.log({ eachStudeent: student });
+      return (
+        <tr key={student.id}>
+          <td className="px-6 py-4 capitalize whitespace-nowrap text-sm font-medium text-gray-800">
+            {student?.fullName || "-"}
+          </td>
+          <td className="px-6 py-4 capitalize whitespace-nowrap text-sm font-medium text-gray-800">
+            {student?.student?.nis || "-"}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+            {student?.student?.schoolYear || "-"}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+            {student?.student?.semester || "-"}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap capitalize text-sm text-gray-800">
+            {student?.student?.class?.name || "-"}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap capitalize text-sm text-gray-800">
+            {student?.nutrition[0]?.nutritionStatus?.information || "-"}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            {(() => {
+              // const isNormal =
+              //   student?.nutrition?.[0]?.nutritionStatus?.information?.toLowerCase() ===
+              //   "gizi normal";
+              const isRecommended = student?.isRecommending ?? false;
+              const studentId = student?.student?.id;
+
+              return isRecommended ? (
                 <button
                   type="button"
                   className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none capitalize"
-                  disabled={isDisabled}
-                  onClick={() => {
-                    setIsOpen(true);
-                  }}
+                  disabled={isRecommended}
                 >
-                  Rekomendasikan
+                  Sedang di rekomendasikan
                 </button>
-                <ModalContainer isOpen={isOpen} onClose={onClose}>
-                  <select
-                    data-hs-select='{
-  "hasSearch": true,
-  "searchPlaceholder": "Search...",
-  "searchClasses": "block w-full sm:text-sm border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 before:absolute before:inset-0 before:z-1 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 py-1.5 sm:py-2 px-3",
-  "searchWrapperClasses": "bg-white p-2 -mx-1 sticky top-0 dark:bg-neutral-900",
-  "placeholder": "Pilih Puskesmas",
-  "toggleTag": "<button type=\"button\" aria-expanded=\"false\"><span class=\"me-2\" data-icon></span><span class=\"text-gray-800 dark:text-neutral-200 \" data-title></span></button>",
-  "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:focus:outline-hidden dark:focus:ring-1 dark:focus:ring-neutral-600",
-  "dropdownClasses": "mt-2 max-h-72 pb-1 px-1 space-y-0.5 z-20 w-full bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700",
-  "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800",
-  "optionTemplate": "<div><div class=\"flex items-center\"><div class=\"me-2\" data-icon></div><div class=\"text-gray-800 dark:text-neutral-200 \" data-title></div></div></div>",
-  "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"shrink-0 size-3.5 text-gray-500 dark:text-neutral-500 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
-}'
-                    className="hidden"
-                    onChange={(e) =>
-                      setSelectedHealthCare(Number(e.target.value))
-                    }
-                    value={selectedHealthCare}
-                  >
-                    <option value="">Choose</option>
-                    {healthcares.map((healthcare) => (
-                      <option value={healthcare.id}>
-                        {healthcare?.name}, {healthcare?.city?.name},{" "}
-                        {healthcare?.province?.name}
-                      </option>
-                    ))}
-                  </select>
+              ) : (
+                <>
                   <button
                     type="button"
-                    className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none w-min "
-                    onClick={() =>
-                      addRecommendation(
-                        {
-                          selectedHealthCare,
-                          familyMemberId: student?.id,
-                          studentId: student?.student?.id,
-                        },
-                        accessToken
-                      )
-                    }
+                    className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none capitalize"
+                    disabled={isRecommended}
+                    onClick={() => {
+                      setSelectedStudent(student);
+                      setIsOpen(true);
+                    }}
                   >
-                    Kirim Rekomendasi
+                    Rekomendasikan
                   </button>
-                </ModalContainer>
-              </>
-            );
-          })()}
-        </td>
-      </tr>
-    ));
+                </>
+              );
+            })()}
+          </td>
+        </tr>
+      );
+    });
   } else {
     tableContent = (
       <tr>
@@ -264,6 +223,54 @@ const TableStudents = () => {
 
   return (
     <>
+      <ModalContainer isOpen={isOpen} onClose={onClose}>
+        <select
+          data-hs-select='{
+  "hasSearch": true,
+  "searchPlaceholder": "Search...",
+  "searchClasses": "block w-full sm:text-sm border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 before:absolute before:inset-0 before:z-1 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 py-1.5 sm:py-2 px-3",
+  "searchWrapperClasses": "bg-white p-2 -mx-1 sticky top-0 dark:bg-neutral-900",
+  "placeholder": "Pilih Puskesmas",
+  "toggleTag": "<button type=\"button\" aria-expanded=\"false\"><span class=\"me-2\" data-icon></span><span class=\"text-gray-800 dark:text-neutral-200 \" data-title></span></button>",
+  "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:focus:outline-hidden dark:focus:ring-1 dark:focus:ring-neutral-600",
+  "dropdownClasses": "mt-2 max-h-72 pb-1 px-1 space-y-0.5 z-20 w-full bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700",
+  "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800",
+  "optionTemplate": "<div><div class=\"flex items-center\"><div class=\"me-2\" data-icon></div><div class=\"text-gray-800 dark:text-neutral-200 \" data-title></div></div></div>",
+  "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"shrink-0 size-3.5 text-gray-500 dark:text-neutral-500 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
+}'
+          className="hidden"
+          onChange={(e) => setSelectedHealthCare(Number(e.target.value))}
+          value={selectedHealthCare}
+        >
+          <option value="">Choose</option>
+          {healthcares.map((healthcare) => (
+            <option value={healthcare.id}>
+              {healthcare?.name}, {healthcare?.city?.name},{" "}
+              {healthcare?.province?.name}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none w-min "
+          onClick={(e) => {
+            if (!selectedStudent) {
+              toast.error("Pilih siswa terlebih dahulu");
+              return;
+            }
+            addRecommendation(
+              {
+                selectedHealthCare,
+                familyMemberId: selectedStudent.id,
+                studentId: selectedStudent.student.id,
+              },
+              accessToken
+            );
+          }}
+        >
+          Kirim Rekomendasi
+        </button>
+      </ModalContainer>
       <div className="flex flex-col">
         <div className="-m-1.5 overflow-x-auto">
           <div className="p-1.5 min-w-full inline-block align-middle">

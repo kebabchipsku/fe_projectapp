@@ -2,8 +2,11 @@ import axios from "axios";
 import api from "./api";
 
 export const getRecommendations = async (token) => {
+  console.log({ token });
   try {
-    console.log({ token });
+    if (!token) {
+      return;
+    }
     const response = await api.get(
       `${import.meta.env.VITE_API_GET_RECOMMENDATIONS}`,
       {

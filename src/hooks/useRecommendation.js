@@ -45,8 +45,8 @@ export const useRecommendation = (mutate) => {
         },
       });
     } catch (err) {
-      toast.error("Gagal membuat rekomendasi");
       console.log({ err });
+      toast.error(`Gagal membuat rekomendasi: ${err.message}`);
     }
   };
 
