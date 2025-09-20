@@ -63,13 +63,13 @@ const TableStudents = () => {
     return response.data;
   };
 
-  const Fetchrecomend = async () => {
-    const response = await getRecommendations();
-    return response.data;
-  };
+  // const Fetchrecomend = async () => {
+  //   const response = await getRecommendations();
+  //   return response.data;
+  // };
 
   const FetchClasses = async () => {
-    const response = await getClasses();
+    const response = await getClasses(accessToken);
     return response.data;
   };
 
@@ -79,13 +79,14 @@ const TableStudents = () => {
     mutate: studentMutate,
   } = useSWR(["students", keyword, page, selectedClass], () => Fetchstudents());
 
-  const { data: recommendationData } = useSWR("recommendations", Fetchrecomend);
-  console.log({ studentData });
+  // const { data: recommendationData } = useSWR("recommendations", Fetchrecomend);
 
   const { data: classesData, isLoading: classesLoading } = useSWR(
     "classes",
     FetchClasses
   );
+
+  console.log({ classesData });
 
   React.useEffect(() => {
     if (classesData) {
@@ -252,7 +253,7 @@ const TableStudents = () => {
         </select>
         <button
           type="button"
-          className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none w-min "
+          className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none w-min justify-center"
           onClick={(e) => {
             if (!selectedStudent) {
               toast.error("Pilih siswa terlebih dahulu");
@@ -268,9 +269,10 @@ const TableStudents = () => {
             );
           }}
         >
-          Kirim Rekomendasi
+          Kirim
         </button>
       </ModalContainer>
+
       <div className="flex flex-col">
         <div className="-m-1.5 overflow-x-auto">
           <div className="p-1.5 min-w-full inline-block align-middle">

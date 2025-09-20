@@ -80,8 +80,6 @@ const TableRecommendation = () => {
     recommendationMutate();
   }, [keyword, page, recommendationMutate]);
 
-  console.log(selectedRec);
-
   if (recommendationLoading) {
     tableContent = [...Array(10)].map((_, index) => (
       <tr key={index}>

@@ -127,10 +127,10 @@ export default function Index({
     username = institution?.username;
   }
   const { user, accessToken } = useAuth();
+  console.log({ user });
 
   const fetchUserById = async (id) => {
     const user = await getUserById(id, accessToken);
-    console.log({ user });
 
     return user.data;
   };
@@ -167,6 +167,7 @@ export default function Index({
     if (gender === "P") return "Perempuan";
     return "-";
   };
+  console.log({ values });
 
   return (
     <PDFViewer width="100%" height={640}>

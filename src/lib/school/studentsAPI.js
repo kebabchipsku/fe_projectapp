@@ -22,6 +22,9 @@ export const getStudentsByInstitution = async (
   limit,
   filteredClass = ""
 ) => {
+  if (!token) {
+    return;
+  }
   try {
     const response = await api.get(
       import.meta.env.VITE_API_GET_STUDENTS_BY_INSTITUTION,

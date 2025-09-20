@@ -82,6 +82,7 @@ const InterventionTable = ({ forWho }) => {
         ? JSON.parse(intervention.options)
         : "";
       const content = parsedContent.content;
+      console.log({ intervention });
 
       return (
         <tr key={intervention.id}>

@@ -210,7 +210,7 @@ const FollowUp = () => {
       if (!select) {
         return;
       }
-      select.parentNode.insertBefore(newLabel, select);
+      // select.parentNode.insertBefore(newLabel, select);
       HSStaticMethods.autoInit();
     }, 100);
   }, [values.school]);

@@ -79,6 +79,22 @@ const SidebarItemSchool = [
   },
 ];
 
+const SidebarItemTeacher = [
+  {
+    id: 1,
+    name: "Dashboard",
+    icon: <TbLayoutDashboardFilled className="w-4 h-4" />,
+    path: "/school/dashboard",
+  },
+
+  {
+    id: 4,
+    name: "Manajemen Murid",
+    icon: <PiStudentFill className="w-4 h-4" />,
+    path: "/school/management-students",
+  },
+];
+
 const SidebarItemParent = [
   {
     id: 1,
@@ -139,8 +155,9 @@ const SidebarItemHealthCare = [
   },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ role = "" }) => {
   const location = useLocation();
+  console.log({ role });
 
   let sidebarItems;
   switch (true) {
@@ -148,7 +165,7 @@ const Sidebar = () => {
       sidebarItems = SidebarItemAdmin;
       break;
     case location.pathname.startsWith("/school"):
-      sidebarItems = SidebarItemSchool;
+      sidebarItems = role === "school" ? SidebarItemSchool : SidebarItemTeacher;
       break;
     case location.pathname.startsWith("/parent"):
       sidebarItems = SidebarItemParent;
