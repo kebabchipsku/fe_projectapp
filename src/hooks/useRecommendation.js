@@ -43,12 +43,12 @@ export const useRecommendation = () => {
     );
   };
 
-  const changeStatusToProcessedRecommendation = async (id) => {
+  const changeStatusToProcessedRecommendation = async (id, token) => {
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     const handleLoading = delay(1000);
 
     toast.promise(
-      handleLoading.then(() => changeStatusToProcessed(id)),
+      handleLoading.then(() => changeStatusToProcessed(id, token)),
       {
         pending: "Loading...",
         success: {

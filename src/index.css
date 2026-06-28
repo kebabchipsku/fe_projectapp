@@ -4,8 +4,6 @@
 @import "../node_modules/preline/variants.css";
 @import "../src/calendar.css";
 @plugin "@tailwindcss/forms";
-@import "../node_modules/react-modal-video/scss/modal-video.scss";
-@import "../node_modules/apexcharts/dist/apexcharts.css";
 
 @custom-variant dark
   (&: where(.dark, .dark *));
@@ -19,6 +17,38 @@
   --color-obito-light-red: #ffe3e1;
   --color-obito-text-secondary: #6a6f7c;
   --color-obito-background: #f8faf9;
+  --color-surface: #faf8ff;
+  --color-surface-dim: #d5d9eb;
+  --color-surface-bright: #faf8ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f1f3ff;
+  --color-surface-container: #e9edff;
+  --color-surface-container-high: #e4e8f9;
+  --color-surface-container-highest: #dee2f3;
+  --color-on-surface: #161b28;
+  --color-on-surface-variant: #444655;
+  --color-inverse-surface: #2b303d;
+  --color-inverse-on-surface: #edf0ff;
+  --color-outline: #747686;
+  --color-outline-variant: #c4c5d7;
+  --color-surface-tint: #294fdb;
+  --color-primary: #264dd9;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #4568f3;
+  --color-on-primary-container: #fffbff;
+  --color-inverse-primary: #b8c3ff;
+  --color-secondary: #835400;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #fdb242;
+  --color-on-secondary-container: #6e4600;
+  --color-tertiary: #006947;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #00855b;
+  --color-on-tertiary-container: #f5fff6;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
 
   --font-sans: Poppins, sans-serif;
 
@@ -65,6 +95,7 @@
 }
 
 @layer base {
+
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
@@ -77,42 +108,67 @@
   }
 }
 
-@keyframes expand {
-  0% {
-    transform: scale(0);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(50);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(100);
-    opacity: 0;
-  }
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
 }
-.expand-circle {
-  position: absolute;
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
   border-radius: 9999px;
-  animation: expand 4s ease-out forwards;
 }
-.circle-1 {
-  width: 6rem;
-  height: 6rem;
-  background-color: oklch(37.9% 0.146 265.522);
-  animation-delay: 0s;
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-outline);
 }
-.circle-2 {
-  width: 6rem;
-  height: 6rem;
-  background-color: oklch(42.4% 0.199 265.638);
-  animation-delay: 0.5s;
+
+/* Landing Page Animations */
+@keyframes blob {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
 }
-.circle-3 {
-  width: 6rem;
-  height: 6rem;
-  background-color: oklch(48.8% 0.243 264.376);
-  animation-delay: 1s;
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+@keyframes bounce-slow {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 4s infinite ease-in-out;
+}
+
+.animate-bounce-slow-delayed {
+  animation: bounce-slow 4.5s infinite ease-in-out 1s;
 }
 
 .ProseMirror:focus {

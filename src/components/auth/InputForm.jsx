@@ -1,5 +1,3 @@
-import React, { Children } from "react";
-
 const InputForm = ({
   htmlFor,
   label,
@@ -12,8 +10,11 @@ const InputForm = ({
   children,
 }) => {
   return (
-    <div className="max-w-md">
-      <label htmlFor={htmlFor} className="block text-sm font-medium mb-2">
+    <div>
+      <label
+        htmlFor={htmlFor}
+        className="block text-sm font-semibold text-on-surface mb-2"
+      >
         {label}
       </label>
       <div className="relative">
@@ -21,7 +22,7 @@ const InputForm = ({
           type={type}
           id={id}
           name={name}
-          className="py-2.5 sm:py-3 px-10 block w-full border border-obito-grey rounded-lg sm:text-sm font-medium focus:border-blue-900 focus:ring-blue-900 disabled:opacity-50 disabled:pointer-events-none"
+          className="block w-full pl-10 pr-3 py-3 border border-outline-variant rounded-lg bg-surface-container-lowest text-on-surface placeholder-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-sm"
           placeholder={placeholder}
           onChange={onChange}
           onBlur={onBlur}

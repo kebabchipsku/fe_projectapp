@@ -79,34 +79,38 @@ const FollowUp = () => {
       setLoadingParent(
         Object.fromEntries(quesionerParentData.map((q) => [q.id, true])),
       );
-      Promise.all(
-        quesionerParentData.map(async (q) => {
-          try {
-            const response = await showResponseForParent(
-              q.id,
-              values.student,
-              keyword[q.id] || "",
-              page[q.id] || 0,
-              limit[q.id] || 10,
-            );
-            return {
-              id: q.id,
-              data: response.data,
-            };
-          } catch (error) {
-            console.log(error);
-          }
-        }),
-      ).then((results) => {
-        const obj = {};
-        results.forEach((r) => {
-          obj[r.id] = r.data;
+      (async () => {
+        const t = await getActiveToken();
+        Promise.all(
+          quesionerParentData.map(async (q) => {
+            try {
+              const response = await showResponseForParent(
+                q.id,
+                values.student,
+                keyword[q.id] || "",
+                page[q.id] || 0,
+                limit[q.id] || 10,
+                t,
+              );
+              return {
+                id: q.id,
+                data: response.data,
+              };
+            } catch (error) {
+              console.log(error);
+            }
+          }),
+        ).then((results) => {
+          const obj = {};
+          results.forEach((r) => {
+            if (r) obj[r.id] = r.data;
+          });
+          setResponseParentData(obj);
+          setLoadingParent(
+            Object.fromEntries(quesionerParentData.map((q) => [q.id, false])),
+          );
         });
-        setResponseParentData(obj);
-        setLoadingParent(
-          Object.fromEntries(quesionerParentData.map((q) => [q.id, false])),
-        );
-      });
+      })();
     }
   }, [quesionerParentData, values.student, keyword, page, limit]);
 
@@ -115,34 +119,38 @@ const FollowUp = () => {
       setLoadingSchool(
         Object.fromEntries(quesionerSchoolData.map((q) => [q.id, true])),
       );
-      Promise.all(
-        quesionerSchoolData.map(async (q) => {
-          try {
-            const response = await showResponseForInstitution(
-              q.id,
-              values.school,
-              keyword[q.id] || "",
-              page[q.id] || 0,
-              limit[q.id] || 10,
-            );
-            return {
-              id: q.id,
-              data: response.data,
-            };
-          } catch (error) {
-            console.log(error);
-          }
-        }),
-      ).then((results) => {
-        const obj = {};
-        results.forEach((r) => {
-          obj[r.id] = r.data;
+      (async () => {
+        const t = await getActiveToken();
+        Promise.all(
+          quesionerSchoolData.map(async (q) => {
+            try {
+              const response = await showResponseForInstitution(
+                q.id,
+                values.school,
+                keyword[q.id] || "",
+                page[q.id] || 0,
+                limit[q.id] || 10,
+                t,
+              );
+              return {
+                id: q.id,
+                data: response.data,
+              };
+            } catch (error) {
+              console.log(error);
+            }
+          }),
+        ).then((results) => {
+          const obj = {};
+          results.forEach((r) => {
+            if (r) obj[r.id] = r.data;
+          });
+          setResponseSchoolData(obj);
+          setLoadingSchool(
+            Object.fromEntries(quesionerSchoolData.map((q) => [q.id, false])),
+          );
         });
-        setResponseSchoolData(obj);
-        setLoadingSchool(
-          Object.fromEntries(quesionerSchoolData.map((q) => [q.id, false])),
-        );
-      });
+      })();
     }
   }, [quesionerSchoolData, values.school, keyword, page, limit]);
 
@@ -260,8 +268,10 @@ const FollowUp = () => {
     if (!selectedRecommendationData) {
       return null;
     }
+    const t = await getActiveToken();
     const recommendation = await getSingleRecommendation(
       selectedRecommendationData.id,
+      t,
     );
     return recommendation.data;
   };

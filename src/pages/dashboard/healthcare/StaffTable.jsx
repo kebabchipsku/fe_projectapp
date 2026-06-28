@@ -77,7 +77,7 @@ const StaffTable = ({ children, handleDelete, handleEdit, setStaffsData }) => {
             {item.phone || "-"}
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-            <div className="flex justify-center items-center gap-x-2">
+            <div className="flex justify-start items-center gap-x-2">
               <button
                 type="button"
                 className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"

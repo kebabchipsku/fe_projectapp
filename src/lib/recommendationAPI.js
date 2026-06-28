@@ -37,10 +37,16 @@ export const createRecommendation = async (data, token) => {
   }
 };
 
-export const changeStatusToProcessed = async (id) => {
+export const changeStatusToProcessed = async (id, token) => {
   try {
     const response = await api.patch(
-      `${import.meta.env.VITE_API_CHANGE_TO_PROCESSED}/${id}`
+      `${import.meta.env.VITE_API_CHANGE_TO_PROCESSED}/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response.data;
   } catch (error) {
@@ -74,10 +80,15 @@ export const createInternvetion = async (
   }
 };
 
-export const getSingleRecommendation = async (id) => {
+export const getSingleRecommendation = async (id, token) => {
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}recommendation/single/${id}`
+      `${import.meta.env.VITE_BASE_URL}recommendation/single/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response.data;
   } catch (error) {
@@ -107,10 +118,15 @@ export const getInterventionBelongsToInstitution = async (
   }
 };
 
-export const deleteIntervention = async (id) => {
+export const deleteIntervention = async (id, token) => {
   try {
     const response = await axios.delete(
-      `${import.meta.env.VITE_BASE_URL}interventions/${id}`
+      `${import.meta.env.VITE_BASE_URL}interventions/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response.data;
   } catch (error) {

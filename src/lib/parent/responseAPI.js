@@ -161,7 +161,8 @@ export const showResponseForInstitution = async (
   user_id,
   keyword,
   page,
-  limit
+  limit,
+  token
 ) => {
   try {
     const response = await api.get(
@@ -172,6 +173,9 @@ export const showResponseForInstitution = async (
           page,
           limit,
         },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
       }
     );
     return response.data;

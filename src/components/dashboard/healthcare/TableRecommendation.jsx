@@ -67,7 +67,8 @@ const TableRecommendation = () => {
     useRecommendation(recommendationMutate);
 
   const fetcherParent = async ([, id]) => {
-    const response = await getParentFamilyMember(id);
+    const t = await getActiveToken();
+    const response = await getParentFamilyMember(id, t);
     return response.data;
   };
 
@@ -152,7 +153,10 @@ const TableRecommendation = () => {
             <button
               type="button"
               className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none capitalize"
-              onClick={() => changeStatusToProcessedRecommendation(rec.id)}
+              onClick={async () => {
+                const t = await getActiveToken();
+                changeStatusToProcessedRecommendation(rec.id, t);
+              }}
               disabled={rec.status.toLowerCase() === "processed"}
             >
               Process

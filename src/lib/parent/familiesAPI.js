@@ -30,10 +30,15 @@ export const getFamilyMember = async (token, keyword, page, limit) => {
   }
 };
 
-export const getParentFamilyMember = async (id) => {
+export const getParentFamilyMember = async (id, token) => {
   try {
     const response = await api.get(
-      `${import.meta.env.VITE_API_GET_PARENT}/${id}/parents`
+      `${import.meta.env.VITE_API_GET_PARENT}/${id}/parents`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      }
     );
     return response.data;
   } catch (error) {
