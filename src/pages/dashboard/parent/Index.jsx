@@ -3,7 +3,7 @@ import useSWR from "swr";
 import { useAuth } from "../../../hooks/auth/useAuth";
 import { token } from "../../../lib/auth/authAPI";
 import { jwtDecode } from "jwt-decode";
-import { getDashboardSummary } from "../../../lib/parent/dashboardApi";
+import { getDashboardSummary } from "../../../lib/parent/dashboardAPI";
 import WelcomeHero from "../../../components/dashboard/WelcomeHero";
 import {
   findConclusionRule,
