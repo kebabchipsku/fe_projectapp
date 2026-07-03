@@ -12,6 +12,7 @@ import {
   markAsRead,
   markAllAsRead,
 } from "../../lib/notificationAPI";
+import Logo from "../main/Logo";
 
 const formatTime = (dateString) => {
   const date = new Date(dateString);
@@ -97,7 +98,8 @@ const Header = () => {
     <header className="sticky top-0 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-48 w-full bg-white border-b border-obito-grey text-sm py-2.5 lg:ps-65 shadow-sm">
       <nav className="px-4 sm:px-6 flex basis-full items-center w-full mx-auto">
         <div className="me-5 lg:me-0 lg:hidden">
-          <a
+          <Logo textSize="text-xs" display="hidden"/>
+          {/* <a
             className="flex-none rounded-md text-xl inline-block font-semibold focus:outline-hidden focus:opacity-80"
             href="/"
             aria-label="Preline"
@@ -135,7 +137,7 @@ const Header = () => {
                 fill="currentColor"
               />
             </svg>
-          </a>
+          </a> */}
         </div>
 
         <div className="w-full flex items-center justify-end ms-auto">
