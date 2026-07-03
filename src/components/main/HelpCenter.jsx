@@ -72,7 +72,7 @@ export default function HelpCenter() {
   return (
     <>
       {/* Letakkan tombol bantuan satu tingkat di atas tombol ScrollToTop. */}
-      <div className="fixed bottom-24 right-5 sm:right-6 z-40 group">
+      <div className="fixed bottom-10 right-5 sm:right-6 z-40 group">
         <span className="pointer-events-none absolute right-0 top-1/2 mr-15 hidden -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 sm:block">
           Butuh panduan?
         </span>
