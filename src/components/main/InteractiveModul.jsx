@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   LuBookOpen,
@@ -29,6 +29,7 @@ export default function InteractiveModule() {
   const [jennyVoiceStatus, setJennyVoiceStatus] = useState(
     "Jenny siap menemanimu bergerak!",
   );
+  const audioRef = useRef(null);
 
   const [storyPage, setStoryPage] = useState(0);
   const [storyChoice, setStoryChoice] = useState(null);
@@ -228,28 +229,69 @@ export default function InteractiveModule() {
   const jennyMoveIntro =
     "Hai, aku Jenny! Selamat datang di Bergerak Itu Seru. Tubuh kita jadi lebih kuat, segar, dan siap belajar ketika kita aktif bergerak. Yuk pilih gerakan serumu hari ini, lalu isi tantangan tujuh hari aktif bersama aku!";
 
+  const JENNY_AUDIO = {
+    intro: "/audio/jenny/intro.mp3",
+    jalan: "/audio/jenny/jalan.mp3",
+    lompat: "/audio/jenny/lompat.mp3",
+    menari: "/audio/jenny/menari.mp3",
+    sepeda: "/audio/jenny/sepeda.mp3",
+    bersih: "/audio/jenny/bersih.mp3",
+  };
+
   const speechSupported =
     typeof window !== "undefined" &&
     "speechSynthesis" in window &&
     "SpeechSynthesisUtterance" in window;
 
   const stopJennyVoice = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     if (speechSupported) {
       window.speechSynthesis.cancel();
     }
     setIsJennySpeaking(false);
   };
 
-  const speakAsJenny = (text = jennyMoveIntro) => {
+  const speakAsJenny = async (text = jennyMoveIntro, audioKey = null) => {
+    stopJennyVoice();
+
+    if (isJennyMuted) return;
+
+    if (audioKey && JENNY_AUDIO[audioKey]) {
+      const audio = new Audio(JENNY_AUDIO[audioKey]);
+      audioRef.current = audio;
+      audio.onended = () => {
+        audioRef.current = null;
+        setIsJennySpeaking(false);
+        setJennyVoiceStatus(
+          "Hebat! Sekarang pilih aktivitas yang ingin kamu lakukan.",
+        );
+      };
+      audio.onerror = () => {
+        audioRef.current = null;
+        fallbackToTTS(text);
+      };
+      setIsJennySpeaking(true);
+      setJennyVoiceStatus("Jenny sedang berbicara... dengarkan dulu, ya!");
+      try {
+        await audio.play();
+      } catch {
+        audioRef.current = null;
+        fallbackToTTS(text);
+      }
+      return;
+    }
+
+    fallbackToTTS(text);
+  };
+
+  const fallbackToTTS = (text) => {
     if (!speechSupported) {
       setJennyVoiceStatus(
         "Suara otomatis belum didukung di browser ini. Coba gunakan Chrome, Edge, atau Safari versi terbaru.",
       );
-      return;
-    }
-
-    if (isJennyMuted) {
-      setJennyVoiceStatus("Suara Jenny sedang dibisukan.");
       return;
     }
 
@@ -274,7 +316,9 @@ export default function InteractiveModule() {
 
     utterance.onend = () => {
       setIsJennySpeaking(false);
-      setJennyVoiceStatus("Hebat! Sekarang pilih aktivitas yang ingin kamu lakukan.");
+      setJennyVoiceStatus(
+        "Hebat! Sekarang pilih aktivitas yang ingin kamu lakukan.",
+      );
     };
 
     utterance.onerror = () => {
@@ -293,7 +337,7 @@ export default function InteractiveModule() {
     if (tab === "move") {
       setJennyVoiceStatus("Jenny sedang menyapa kamu...");
       if (!isJennyMuted) {
-        speakAsJenny();
+        speakAsJenny(jennyMoveIntro, "intro");
       }
       return;
     }
@@ -304,7 +348,9 @@ export default function InteractiveModule() {
   const toggleJennyMute = () => {
     if (isJennyMuted) {
       setIsJennyMuted(false);
-      setJennyVoiceStatus("Suara Jenny sudah aktif. Tekan Dengarkan Jenny untuk memulai.");
+      setJennyVoiceStatus(
+        "Suara Jenny sudah aktif. Tekan Dengarkan Jenny untuk memulai.",
+      );
       return;
     }
 
@@ -315,10 +361,11 @@ export default function InteractiveModule() {
 
   useEffect(() => {
     return () => {
-      if (
-        typeof window !== "undefined" &&
-        "speechSynthesis" in window
-      ) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      if (typeof window !== "undefined" && window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
     };
@@ -442,7 +489,8 @@ export default function InteractiveModule() {
         title: "Jenny sedang jalan santai",
         coachText:
           "Ayo langkahkan kaki kanan dan kiri bergantian sambil mengayunkan tangan dengan santai.",
-        funFact: "Jalan kaki membantu tubuh tetap aktif dan membuat jantung lebih sehat.",
+        funFact:
+          "Jalan kaki membantu tubuh tetap aktif dan membuat jantung lebih sehat.",
         badge: "🚶",
         prop: "👟",
         animate: { x: [-16, 16, -16], y: [0, -3, 0], rotate: [0, -2, 0, 2, 0] },
@@ -454,10 +502,15 @@ export default function InteractiveModule() {
         title: "Jenny sedang lompat tali",
         coachText:
           "Tekuk lutut sedikit lalu melompat ringan sambil menjaga tubuh tetap seimbang.",
-        funFact: "Lompat tali bagus untuk melatih kekuatan kaki dan koordinasi tubuh.",
+        funFact:
+          "Lompat tali bagus untuk melatih kekuatan kaki dan koordinasi tubuh.",
         badge: "🪢",
         prop: "✨",
-        animate: { y: [0, -28, 0], scaleY: [1, 0.96, 1], rotate: [0, -2, 0, 2, 0] },
+        animate: {
+          y: [0, -28, 0],
+          scaleY: [1, 0.96, 1],
+          rotate: [0, -2, 0, 2, 0],
+        },
         transition: { duration: 1.1, repeat: Infinity, ease: "easeInOut" },
         voiceText:
           "Hebat! Sekarang kita lompat tali. Satu, dua, tiga! Lompat ringan dan terus tersenyum ya!",
@@ -466,7 +519,8 @@ export default function InteractiveModule() {
         title: "Jenny sedang menari",
         coachText:
           "Goyangkan badan ke kanan dan ke kiri, lalu ayunkan tangan mengikuti irama lagu favoritmu.",
-        funFact: "Menari membantu tubuh aktif sekaligus membuat suasana hati jadi lebih ceria.",
+        funFact:
+          "Menari membantu tubuh aktif sekaligus membuat suasana hati jadi lebih ceria.",
         badge: "💃",
         prop: "🎵",
         animate: { x: [-12, 12, -12], rotate: [-10, 10, -10], y: [0, -6, 0] },
@@ -478,7 +532,8 @@ export default function InteractiveModule() {
         title: "Jenny sedang bersepeda",
         coachText:
           "Bayangkan kamu mengayuh sepeda dengan ritme stabil sambil menjaga tubuh tetap seimbang.",
-        funFact: "Bersepeda melatih stamina, keseimbangan, dan membuat tubuh terasa segar.",
+        funFact:
+          "Bersepeda melatih stamina, keseimbangan, dan membuat tubuh terasa segar.",
         badge: "🚴",
         prop: "🚲",
         animate: { x: [-14, 14, -14], y: [0, -4, 0], rotate: [-3, 3, -3] },
@@ -490,7 +545,8 @@ export default function InteractiveModule() {
         title: "Jenny sedang bantu bersih-bersih",
         coachText:
           "Gerakkan tubuh ke kanan dan ke kiri seperti sedang menyapu sambil merapikan ruangan.",
-        funFact: "Menyapu dan merapikan rumah juga termasuk aktivitas fisik yang menyehatkan.",
+        funFact:
+          "Menyapu dan merapikan rumah juga termasuk aktivitas fisik yang menyehatkan.",
         badge: "🧹",
         prop: "🏠",
         animate: { rotate: [0, -8, 8, -8, 0], x: [0, 6, -6, 0], y: [0, -2, 0] },
@@ -521,7 +577,11 @@ export default function InteractiveModule() {
     );
 
     if (activeTab === "move" && !isJennyMuted) {
-      speakAsJenny(scene?.voiceText || `Yuk lakukan ${selectedActivity.name} bersama Jenny!`);
+      speakAsJenny(
+        scene?.voiceText ||
+          `Yuk lakukan ${selectedActivity.name} bersama Jenny!`,
+        activityId || "intro",
+      );
     }
   };
 
@@ -568,7 +628,9 @@ export default function InteractiveModule() {
             </div>
 
             <button
-              onClick={() => speakAsJenny(scene.voiceText)}
+              onClick={() =>
+                speakAsJenny(scene.voiceText, selectedMoveActivity)
+              }
               disabled={!speechSupported || isJennyMuted}
               className="mt-4 inline-flex items-center gap-2 rounded-xl bg-rose-500 px-3.5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
@@ -579,8 +641,12 @@ export default function InteractiveModule() {
 
           <div className="lg:col-span-7 p-5 sm:p-6 flex items-center justify-center min-h-[300px] relative overflow-hidden">
             <div className="absolute inset-x-10 bottom-6 h-8 rounded-full bg-amber-200/45 blur-xl" />
-            <div className="absolute right-10 top-8 text-4xl opacity-70">{scene.prop}</div>
-            <div className="absolute left-8 top-10 text-2xl opacity-70">{selectedActivity.emoji}</div>
+            <div className="absolute right-10 top-8 text-4xl opacity-70">
+              {scene.prop}
+            </div>
+            <div className="absolute left-8 top-10 text-2xl opacity-70">
+              {selectedActivity.emoji}
+            </div>
 
             <motion.div
               animate={scene.animate}
@@ -596,28 +662,85 @@ export default function InteractiveModule() {
                 className="h-64 w-52 drop-shadow-xl"
                 aria-hidden="true"
               >
-                <ellipse cx="90" cy="205" rx="52" ry="10" fill="#d9dfe7" opacity="0.55" />
+                <ellipse
+                  cx="90"
+                  cy="205"
+                  rx="52"
+                  ry="10"
+                  fill="#d9dfe7"
+                  opacity="0.55"
+                />
                 <path d="M66 125 L52 186 L74 186 L84 136" fill="#ffd5b8" />
                 <path d="M116 125 L130 186 L108 186 L96 136" fill="#ffd5b8" />
-                <path d="M46 184 L77 184 L77 195 L42 195 Z" rx="6" fill="#ff7f93" />
-                <path d="M103 184 L135 184 L140 195 L105 195 Z" rx="6" fill="#ff7f93" />
-                <path d="M61 90 Q90 80 119 90 L124 133 Q90 145 56 133 Z" fill="#41b7db" />
-                <path d="M76 91 L78 128 M104 91 L102 128" stroke="#ffffff" strokeWidth="5" strokeLinecap="round" />
-                <path d="M66 103 Q90 114 114 103" stroke="#2f8eae" strokeWidth="3" fill="none" />
-                <path d="M61 95 L35 120" stroke="#ffd5b8" strokeWidth="12" strokeLinecap="round" />
-                <path d="M119 95 L145 80" stroke="#ffd5b8" strokeWidth="12" strokeLinecap="round" />
+                <path
+                  d="M46 184 L77 184 L77 195 L42 195 Z"
+                  rx="6"
+                  fill="#ff7f93"
+                />
+                <path
+                  d="M103 184 L135 184 L140 195 L105 195 Z"
+                  rx="6"
+                  fill="#ff7f93"
+                />
+                <path
+                  d="M61 90 Q90 80 119 90 L124 133 Q90 145 56 133 Z"
+                  fill="#41b7db"
+                />
+                <path
+                  d="M76 91 L78 128 M104 91 L102 128"
+                  stroke="#ffffff"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M66 103 Q90 114 114 103"
+                  stroke="#2f8eae"
+                  strokeWidth="3"
+                  fill="none"
+                />
+                <path
+                  d="M61 95 L35 120"
+                  stroke="#ffd5b8"
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M119 95 L145 80"
+                  stroke="#ffd5b8"
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                />
                 <circle cx="147" cy="78" r="8" fill="#ffd5b8" />
-                <path d="M146 74 L160 65" stroke="#ffd5b8" strokeWidth="5" strokeLinecap="round" />
+                <path
+                  d="M146 74 L160 65"
+                  stroke="#ffd5b8"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
                 <circle cx="90" cy="62" r="36" fill="#ffd5b8" />
-                <path d="M53 62 Q48 24 77 20 Q90 7 108 20 Q136 23 128 58 Q120 43 101 39 Q75 48 53 62" fill="#6a422f" />
+                <path
+                  d="M53 62 Q48 24 77 20 Q90 7 108 20 Q136 23 128 58 Q120 43 101 39 Q75 48 53 62"
+                  fill="#6a422f"
+                />
                 <circle cx="59" cy="33" r="17" fill="#6a422f" />
                 <circle cx="121" cy="33" r="17" fill="#6a422f" />
-                <path d="M74 64 Q90 75 106 64" stroke="#d96677" strokeWidth="4" fill="none" strokeLinecap="round" />
+                <path
+                  d="M74 64 Q90 75 106 64"
+                  stroke="#d96677"
+                  strokeWidth="4"
+                  fill="none"
+                  strokeLinecap="round"
+                />
                 <circle cx="76" cy="55" r="3.8" fill="#55372c" />
                 <circle cx="104" cy="55" r="3.8" fill="#55372c" />
                 <circle cx="63" cy="68" r="6" fill="#f3a6a4" opacity="0.8" />
                 <circle cx="117" cy="68" r="6" fill="#f3a6a4" opacity="0.8" />
-                <path d="M73 101 L90 112 L107 101" stroke="#ffdf52" strokeWidth="4" fill="none" />
+                <path
+                  d="M73 101 L90 112 L107 101"
+                  stroke="#ffdf52"
+                  strokeWidth="4"
+                  fill="none"
+                />
                 <circle cx="149" cy="79" r="4" fill="#ffffff" opacity="0.9" />
               </svg>
             </motion.div>
@@ -637,7 +760,10 @@ export default function InteractiveModule() {
   };
 
   return (
-    <section id="permainan" className="py-16 bg-gradient-to-b from-surface to-slate-50 border-t border-b border-outline-variant/20 font-sans relative">
+    <section
+      id="permainan"
+      className="py-16 bg-gradient-to-b from-surface to-slate-50 border-t border-b border-outline-variant/20 font-sans relative"
+    >
       {/* Decorative dots background */}
       <div className="absolute top-10 right-10 opacity-10 pointer-events-none">
         <svg width="100" height="100" fill="currentColor">
@@ -1444,38 +1570,121 @@ export default function InteractiveModule() {
                       <div className="relative flex flex-col sm:flex-row sm:items-center gap-4">
                         <motion.div
                           animate={{ y: [0, -7, 0], rotate: [0, -2, 0, 2, 0] }}
-                          transition={{ duration: 2.7, repeat: Infinity, ease: "easeInOut" }}
+                          transition={{
+                            duration: 2.7,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
                           className="relative shrink-0 self-start sm:self-center"
                         >
-                          <div className="absolute -left-2 -top-2 text-xl">✨</div>
-                          <div className="absolute -right-3 top-8 text-lg">💫</div>
+                          <div className="absolute -left-2 -top-2 text-xl">
+                            ✨
+                          </div>
+                          <div className="absolute -right-3 top-8 text-lg">
+                            💫
+                          </div>
                           <svg
                             viewBox="0 0 150 170"
                             className="h-32 w-28 drop-shadow-lg"
                             aria-hidden="true"
                           >
-                            <ellipse cx="75" cy="158" rx="43" ry="7" fill="#d9dfe7" opacity="0.55" />
-                            <path d="M48 113 L37 150 L56 150 L68 118" fill="#ffd5b8" />
-                            <path d="M102 113 L113 150 L94 150 L82 118" fill="#ffd5b8" />
-                            <path d="M35 148 L59 148 L59 157 L32 157 Z" rx="6" fill="#ff7f93" />
-                            <path d="M91 148 L116 148 L120 157 L93 157 Z" rx="6" fill="#ff7f93" />
-                            <path d="M49 83 Q75 75 101 83 L106 121 Q75 132 44 121 Z" fill="#41b7db" />
-                            <path d="M61 84 L63 116 M89 84 L87 116" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" />
-                            <path d="M52 95 Q75 104 98 95" stroke="#2f8eae" strokeWidth="3" fill="none" />
-                            <path d="M48 88 L27 105" stroke="#ffd5b8" strokeWidth="11" strokeLinecap="round" />
-                            <path d="M102 88 L126 72" stroke="#ffd5b8" strokeWidth="11" strokeLinecap="round" />
+                            <ellipse
+                              cx="75"
+                              cy="158"
+                              rx="43"
+                              ry="7"
+                              fill="#d9dfe7"
+                              opacity="0.55"
+                            />
+                            <path
+                              d="M48 113 L37 150 L56 150 L68 118"
+                              fill="#ffd5b8"
+                            />
+                            <path
+                              d="M102 113 L113 150 L94 150 L82 118"
+                              fill="#ffd5b8"
+                            />
+                            <path
+                              d="M35 148 L59 148 L59 157 L32 157 Z"
+                              rx="6"
+                              fill="#ff7f93"
+                            />
+                            <path
+                              d="M91 148 L116 148 L120 157 L93 157 Z"
+                              rx="6"
+                              fill="#ff7f93"
+                            />
+                            <path
+                              d="M49 83 Q75 75 101 83 L106 121 Q75 132 44 121 Z"
+                              fill="#41b7db"
+                            />
+                            <path
+                              d="M61 84 L63 116 M89 84 L87 116"
+                              stroke="#ffffff"
+                              strokeWidth="4"
+                              strokeLinecap="round"
+                            />
+                            <path
+                              d="M52 95 Q75 104 98 95"
+                              stroke="#2f8eae"
+                              strokeWidth="3"
+                              fill="none"
+                            />
+                            <path
+                              d="M48 88 L27 105"
+                              stroke="#ffd5b8"
+                              strokeWidth="11"
+                              strokeLinecap="round"
+                            />
+                            <path
+                              d="M102 88 L126 72"
+                              stroke="#ffd5b8"
+                              strokeWidth="11"
+                              strokeLinecap="round"
+                            />
                             <circle cx="127" cy="70" r="7" fill="#ffd5b8" />
-                            <path d="M128 66 L141 57" stroke="#ffd5b8" strokeWidth="5" strokeLinecap="round" />
+                            <path
+                              d="M128 66 L141 57"
+                              stroke="#ffd5b8"
+                              strokeWidth="5"
+                              strokeLinecap="round"
+                            />
                             <circle cx="75" cy="58" r="31" fill="#ffd5b8" />
-                            <path d="M44 59 Q39 26 64 21 Q74 9 91 21 Q113 22 108 55 Q101 39 85 35 Q63 46 44 59" fill="#6a422f" />
+                            <path
+                              d="M44 59 Q39 26 64 21 Q74 9 91 21 Q113 22 108 55 Q101 39 85 35 Q63 46 44 59"
+                              fill="#6a422f"
+                            />
                             <circle cx="51" cy="31" r="15" fill="#6a422f" />
                             <circle cx="101" cy="31" r="15" fill="#6a422f" />
-                            <path d="M61 60 Q75 70 89 60" stroke="#d96677" strokeWidth="3" fill="none" strokeLinecap="round" />
+                            <path
+                              d="M61 60 Q75 70 89 60"
+                              stroke="#d96677"
+                              strokeWidth="3"
+                              fill="none"
+                              strokeLinecap="round"
+                            />
                             <circle cx="63" cy="53" r="3" fill="#55372c" />
                             <circle cx="87" cy="53" r="3" fill="#55372c" />
-                            <circle cx="52" cy="64" r="5" fill="#f3a6a4" opacity="0.8" />
-                            <circle cx="98" cy="64" r="5" fill="#f3a6a4" opacity="0.8" />
-                            <path d="M62 91 L75 100 L88 91" stroke="#ffdf52" strokeWidth="3" fill="none" />
+                            <circle
+                              cx="52"
+                              cy="64"
+                              r="5"
+                              fill="#f3a6a4"
+                              opacity="0.8"
+                            />
+                            <circle
+                              cx="98"
+                              cy="64"
+                              r="5"
+                              fill="#f3a6a4"
+                              opacity="0.8"
+                            />
+                            <path
+                              d="M62 91 L75 100 L88 91"
+                              stroke="#ffdf52"
+                              strokeWidth="3"
+                              fill="none"
+                            />
                           </svg>
                         </motion.div>
 
@@ -1516,7 +1725,9 @@ export default function InteractiveModule() {
                           <div className="mt-4 flex flex-wrap gap-2">
                             <button
                               onClick={() =>
-                                isJennySpeaking ? stopJennyVoice() : speakAsJenny()
+                                isJennySpeaking
+                                  ? stopJennyVoice()
+                                  : speakAsJenny(jennyMoveIntro, "intro")
                               }
                               disabled={!speechSupported || isJennyMuted}
                               className="inline-flex items-center gap-2 rounded-xl bg-rose-500 px-3.5 py-2.5 text-base font-bold text-white shadow-sm transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
@@ -1526,10 +1737,14 @@ export default function InteractiveModule() {
                               ) : (
                                 <LuPlay className="h-4 w-4" />
                               )}
-                              {isJennySpeaking ? "Hentikan Suara" : "Dengarkan Jenny"}
+                              {isJennySpeaking
+                                ? "Hentikan Suara"
+                                : "Dengarkan Jenny"}
                             </button>
                             <button
-                              onClick={() => speakAsJenny()}
+                              onClick={() =>
+                                speakAsJenny(jennyMoveIntro, "intro")
+                              }
                               disabled={!speechSupported || isJennyMuted}
                               className="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-white/80 px-3.5 py-2.5 text-base font-bold text-amber-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                             >
@@ -1601,8 +1816,8 @@ export default function InteractiveModule() {
                               Kurangi Duduk, Perbanyak Gerak
                             </h4>
                             <p className="text-base text-slate-600 mt-1 leading-relaxed">
-                              Anak usia sekolah dianjurkan aktif bergerak minimal
-                              60 menit setiap hari.
+                              Anak usia sekolah dianjurkan aktif bergerak
+                              minimal 60 menit setiap hari.
                             </p>
                           </div>
                           <div className="shrink-0 text-right">
@@ -1623,7 +1838,9 @@ export default function InteractiveModule() {
                             type="number"
                             min="0"
                             value={dailySteps}
-                            onChange={(event) => setDailySteps(event.target.value)}
+                            onChange={(event) =>
+                              setDailySteps(event.target.value)
+                            }
                             placeholder="Contoh: 2500"
                             className="w-full bg-transparent px-3 py-2 text-base text-slate-700 outline-none"
                           />
@@ -1646,7 +1863,8 @@ export default function InteractiveModule() {
                             Gerak Seru Bareng Jenny
                           </h4>
                           <p className="text-base text-slate-500 mt-0.5">
-                            Pilih aktivitas yang paling ingin kamu lakukan hari ini.
+                            Pilih aktivitas yang paling ingin kamu lakukan hari
+                            ini.
                           </p>
                         </div>
                         {selectedMoveActivity && (
@@ -1659,19 +1877,24 @@ export default function InteractiveModule() {
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
                         {moveActivities.map((activity) => {
-                          const isSelected = selectedMoveActivity === activity.id;
+                          const isSelected =
+                            selectedMoveActivity === activity.id;
 
                           return (
                             <button
                               key={activity.id}
-                              onClick={() => handleMoveActivitySelect(activity.id)}
+                              onClick={() =>
+                                handleMoveActivitySelect(activity.id)
+                              }
                               className={`rounded-xl border p-3 text-left transition-all cursor-pointer ${
                                 isSelected
                                   ? "bg-emerald-50 border-emerald-500 shadow-sm"
                                   : "bg-white border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40"
                               }`}
                             >
-                              <span className="text-2xl block">{activity.emoji}</span>
+                              <span className="text-2xl block">
+                                {activity.emoji}
+                              </span>
                               <span className="text-base leading-tight font-bold text-slate-700 block mt-2">
                                 {activity.name}
                               </span>
@@ -1688,7 +1911,8 @@ export default function InteractiveModule() {
                         >
                           {
                             moveActivities.find(
-                              (activity) => activity.id === selectedMoveActivity,
+                              (activity) =>
+                                activity.id === selectedMoveActivity,
                             )?.desc
                           }
                         </motion.p>
@@ -1704,7 +1928,8 @@ export default function InteractiveModule() {
                             Tantangan 7 Hari Aktif
                           </h4>
                           <p className="text-base text-slate-500 mt-1">
-                            Tandai hari ketika kamu sudah melakukan aktivitas fisik.
+                            Tandai hari ketika kamu sudah melakukan aktivitas
+                            fisik.
                           </p>
                         </div>
                         <span className="text-base font-bold text-slate-500">
@@ -1819,7 +2044,9 @@ export default function InteractiveModule() {
                       <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/60">
                         <h4 className="font-bold text-xs text-slate-800 flex items-center gap-1.5">
                           <LuClipboardList className="h-4 w-4 text-primary" />
-                          <span className="text-base">Materi Pembelajaran Utama:</span>
+                          <span className="text-base">
+                            Materi Pembelajaran Utama:
+                          </span>
                         </h4>
                         <ul className="text-slate-500 mt-2 space-y-1 list-disc pl-4">
                           <li>Bahaya &amp; Ciri-Ciri Gizi Lebih</li>
@@ -1832,7 +2059,9 @@ export default function InteractiveModule() {
                       <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/60">
                         <h4 className="font-bold text-xs text-slate-800 flex items-center gap-1.5">
                           <LuCalendar className="h-4 w-4 text-primary" />
-                          <span className="text-base">Template Evaluasi Rumah:</span>
+                          <span className="text-base">
+                            Template Evaluasi Rumah:
+                          </span>
                         </h4>
                         <ul className="text-slate-500 mt-2 space-y-1 list-disc pl-4">
                           <li>Jurnal Makan &amp; Aktivitasku Harian</li>

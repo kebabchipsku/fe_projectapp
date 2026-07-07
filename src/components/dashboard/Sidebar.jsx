@@ -96,10 +96,16 @@ const SidebarItemTeacher = [
   },
 
   {
-    id: 4,
+    id: 2,
     name: "Manajemen Murid",
     icon: <PiStudentFill className="w-4 h-4" />,
     path: "/school/management-students",
+  },
+  {
+    id: 3,
+    name: "Pertanyaan",
+    icon: <MdQuestionAnswer className="w-4 h-4" />,
+    path: "/school/quesioner",
   },
 ];
 

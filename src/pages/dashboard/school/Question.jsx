@@ -66,8 +66,7 @@ const Question = () => {
     const response = await getQuesioners();
     return response.data.filter(
       (item) =>
-        item.title === "Pelayanan Kesehatan Sekolah" ||
-        item.title === "Lingkungan Sekolah"
+        item.title === "Pelayanan Kesehatan Sekolah"
     );
   };
 
