@@ -66,7 +66,7 @@ export const createInternvetion = async (
       {
         forType,
         notes,
-        content: JSON.stringify(content),
+        content,
       },
       {
         headers: {

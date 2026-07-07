@@ -1,44 +1,164 @@
-export const CONCLUSION_RULES = [
-  { id: 1, name: "Tidak Berisiko Gizi Lebih", minGood: 6, maxGood: 6, icon: "🏆", color: "from-emerald-500 to-teal-600" },
-  { id: 2, name: "Berisiko Gizi Lebih",       minGood: 5, maxGood: 5, icon: "⚠️", color: "from-amber-500 to-orange-600" },
-  { id: 3, name: "Gizi Lebih",                minGood: 0, maxGood: 4, icon: "🚨", color: "from-rose-500 to-red-600" },
-];
+// ---- saran texts ----
 
-export const findConclusionRule = (goodCount) =>
-  CONCLUSION_RULES.find(r => goodCount >= r.minGood && goodCount <= r.maxGood);
-
-const SARAN_ORTU_GIZI_BAIK = [
+export const SARAN_ORTU_GIZI_BAIK = [
   "Tetap pertahankan status gizi anak anda",
   "Jangan berhenti berikan makanan dan minuman terbaik untuk anak",
   "Dukung aktivitas fisik anak yang bermanfaat untuk tubuh",
   "Pastikan kebutuhan tidur anak terpenuhi",
 ];
 
-const SARAN_ORTU_BURUK_OVERWEIGHT = [
+export const SARAN_ORTU_BURUK_OVERWEIGHT = [
   "Segera periksakan anak anda ke Ahli Gizi/fasilitas layanan kesehatan terdekat",
   "Berikan contoh perilaku makan dan minum yang baik di rumah",
   "Dukung aktivitas fisik anak yang bermanfaat untuk tubuh",
   "Pastikan kebutuhan tidur anak terpenuhi",
 ];
 
-const SARAN_SEKOLAH_GIZI_BAIK = [
+export const SARAN_SEKOLAH_GIZI_BAIK = [
   "Budayakan perilaku hidup sehat dalam lingkungan sekolah",
 ];
 
-const SARAN_SEKOLAH_BURUK_OVERWEIGHT = [
+export const SARAN_SEKOLAH_BURUK_OVERWEIGHT = [
   "Rekomendasi tindaklanjut Puskesmas",
   "Budayakan perilaku hidup sehat dalam lingkungan sekolah",
 ];
 
-export const CONCLUSION_SARAN = {
-  1: {
-    "GIZI BAIK":         { parent: SARAN_ORTU_GIZI_BAIK,        school: SARAN_SEKOLAH_GIZI_BAIK },
-    "GIZI BURUK-KURANG": { parent: SARAN_ORTU_BURUK_OVERWEIGHT, school: SARAN_SEKOLAH_BURUK_OVERWEIGHT },
+// ---- helpers ----
+const getQuestionnaireGood = (data, titleKeyword) =>
+  data.questionnaireResults?.find((r) => r.title.includes(titleKeyword))
+    ?.interpretation === "Baik";
+
+const buildIndicators = (data) => [
+  {
+    label: "Status Gizi",
+    value: data.latestNutritionStatus || "Tidak Terdata",
+    good: data.latestNutritionStatus === "GIZI BAIK",
   },
-  2: {
-    "GIZI BAIK":         { parent: SARAN_ORTU_GIZI_BAIK,        school: SARAN_SEKOLAH_GIZI_BAIK },
+  {
+    label: "Kebiasaan Sehari-hari",
+    value: getInterpretation(data, "Kebiasaan"),
+    good: getQuestionnaireGood(data, "Kebiasaan"),
   },
-  3: {
-    "OVERWEIGHT-OBESITAS": { parent: SARAN_ORTU_BURUK_OVERWEIGHT, school: SARAN_SEKOLAH_BURUK_OVERWEIGHT },
+  {
+    label: "Pengetahuan Gizi",
+    value: getInterpretation(data, "Pengetahuan"),
+    good: getQuestionnaireGood(data, "Pengetahuan"),
   },
+  {
+    label: "Sosial Ekonomi",
+    value: data.socioEconomic?.interpretation || "Belum diisi",
+    good: data.socioEconomic?.interpretation === "Menengah-Tinggi",
+  },
+  {
+    label: "Pendidikan Orang Tua",
+    value:
+      data.parentEducation?.ibu?.category === "Menengah-Tinggi" ||
+      data.parentEducation?.ayah?.category === "Menengah-Tinggi"
+        ? "Menengah-Tinggi"
+        : "Dasar",
+    good:
+      data.parentEducation?.ibu?.category === "Menengah-Tinggi" ||
+      data.parentEducation?.ayah?.category === "Menengah-Tinggi",
+  },
+  {
+    label: "Pelayanan Kesehatan Sekolah",
+    value: data.schoolHealthService?.interpretation || "Belum diisi",
+    good: data.schoolHealthService?.interpretation === "Tinggi",
+  },
+];
+
+const getInterpretation = (data, titleKeyword) =>
+  data.questionnaireResults?.find((r) => r.title.includes(titleKeyword))
+    ?.interpretation || "Belum diisi";
+
+const makeConclusion = ({ kategori, icon, color, saranOrtu, goodCount }) => ({
+  kategori,
+  icon,
+  color,
+  saran: saranOrtu,
+  goodCount,
+  total: 6,
+});
+
+export const getParentConclusion = (data) => {
+  if (!data) return null;
+
+  const indicators = buildIndicators(data);
+  const goodCount = indicators.filter((i) => i.good).length;
+
+  const nutritionStatus = data.latestNutritionStatus;
+
+  if (nutritionStatus === "OVERWEIGHT-OBESITAS") {
+    return makeConclusion({
+      id: 3,
+      kategori: "Gizi Lebih",
+      icon: "🚨",
+      color: "from-rose-500 to-red-600",
+      saranOrtu: SARAN_ORTU_BURUK_OVERWEIGHT,
+      saranSekolah: SARAN_SEKOLAH_BURUK_OVERWEIGHT,
+      goodCount,
+    });
+  }
+
+  if (nutritionStatus === "GIZI BURUK-KURANG") {
+    return makeConclusion({
+      id: 1,
+      kategori: "Tidak Berisiko Gizi Lebih",
+      icon: "🏆",
+      color: "from-emerald-500 to-teal-600",
+      saranOrtu: SARAN_ORTU_BURUK_OVERWEIGHT,
+      saranSekolah: SARAN_SEKOLAH_BURUK_OVERWEIGHT,
+      goodCount,
+    });
+  }
+
+  if (nutritionStatus === "GIZI BAIK") {
+    const nonStatusGood = indicators
+      .filter((i) => i.label !== "Status Gizi")
+      .every((i) => i.good);
+
+    if (nonStatusGood) {
+      return makeConclusion({
+        id: 1,
+        kategori: "Tidak Berisiko Gizi Lebih",
+        icon: "🏆",
+        color: "from-emerald-500 to-teal-600",
+        saranOrtu: SARAN_ORTU_GIZI_BAIK,
+        saranSekolah: SARAN_SEKOLAH_GIZI_BAIK,
+        goodCount,
+      });
+    }
+
+    const triggerGood = {
+      kebiasaan: getQuestionnaireGood(data, "Kebiasaan"),
+      pengetahuan: getQuestionnaireGood(data, "Pengetahuan"),
+      sosialEkonomi: data.socioEconomic?.interpretation === "Menengah-Tinggi",
+    };
+
+    const anyTriggerBad = !Object.values(triggerGood).every(Boolean);
+
+    if (anyTriggerBad) {
+      return makeConclusion({
+        id: 2,
+        kategori: "Berisiko Gizi Lebih",
+        icon: "⚠️",
+        color: "from-amber-500 to-orange-600",
+        saranOrtu: SARAN_ORTU_GIZI_BAIK,
+        saranSekolah: SARAN_SEKOLAH_GIZI_BAIK,
+        goodCount,
+      });
+    }
+
+    return makeConclusion({
+      id: 1,
+      kategori: "Tidak Berisiko Gizi Lebih",
+      icon: "🏆",
+      color: "from-emerald-500 to-teal-600",
+      saranOrtu: SARAN_ORTU_GIZI_BAIK,
+      saranSekolah: SARAN_SEKOLAH_GIZI_BAIK,
+      goodCount,
+    });
+  }
+
+  return null;
 };

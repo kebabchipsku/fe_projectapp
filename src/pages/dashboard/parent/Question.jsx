@@ -304,7 +304,7 @@ const Question = () => {
         <div className="min-h-screen bg-slate-100 p-8">
           <div className="mx-auto max-w-xl rounded-xl bg-white p-8 text-center shadow-sm">
             <h1 className="text-lg font-semibold text-slate-700">
-              Belum ada pertanyaan pada kuisioner ini.
+              Belum ada pertanyaan pada kuesioner ini.
             </h1>
 
             <button
@@ -539,8 +539,8 @@ const Question = () => {
             role="tooltip"
           >
             {answeredStatus[item.id]
-              ? "Anda sudah menjawab kuisioner"
-              : "Mulai kuisioner"}
+              ? "Anda sudah menjawab kuesioner"
+              : "Mulai kuesioner"}
           </span>
         </div>
       </div>

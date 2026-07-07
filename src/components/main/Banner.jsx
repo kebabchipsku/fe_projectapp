@@ -25,7 +25,7 @@ const Banner = () => {
             <span className="text-white font-heading text-4xl md:text-5xl font-bold mb-2">
               1.000+
             </span>
-            <span className="font-semibold text-white/80">Kuisioner Terisi</span>
+            <span className="font-semibold text-white/80">Kuesioner Terisi</span>
           </div>
         </div>
       </div>

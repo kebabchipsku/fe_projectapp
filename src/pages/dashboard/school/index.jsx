@@ -15,7 +15,12 @@ const SCORE_COLORS = [
   { bg: "from-amber-500 to-amber-600" },
 ];
 
-const CHART_COLORS = ["#10b981", "#ef4444", "#f59e0b", "#3b82f6"];
+const NUTRITION_COLOR_MAP = {
+  "GIZI BAIK": "#10b981",
+  "OVERWEIGHT-OBESITAS": "#f59e0b",
+  "GIZI BURUK-KURANG": "#ef4444",
+  "Tidak Terdata": "#9ca3af",
+};
 
 const Index = () => {
   const { accessToken, setAccessToken, user, setUser } = useAuth();
@@ -64,13 +69,10 @@ const Index = () => {
   ];
 
   const nutritionData =
-    data?.nutritionDistribution?.map((item, index) => ({
+    data?.nutritionDistribution?.map((item) => ({
       name: item.displayName,
       total: item.total,
-      fill:
-        item.displayName === "Tidak Terdata"
-          ? "#9ca3af"
-          : CHART_COLORS[index % CHART_COLORS.length],
+      fill: NUTRITION_COLOR_MAP[item.displayName] || "#3b82f6",
     })) || [];
 
   const classData =
@@ -103,9 +105,9 @@ const Index = () => {
     <div className="space-y-6">
       <WelcomeHero
         percentage={data?.questionnaireProgress || 0}
-        description="Isi kuisioner untuk mengevaluasi pelayanan kesehatan di sekolah Anda."
+        description="Isi kuesioner untuk mengevaluasi pelayanan kesehatan di sekolah Anda."
         buttonLink="/school/quesioner"
-        buttonText="Isi Kuisioner Sekarang"
+        buttonText="Isi Kuesioner Sekarang"
         completedQuisioner={!!data?.questionnaireResult}
       />
 
@@ -133,7 +135,7 @@ const Index = () => {
                 Kesimpulan &amp; Saran
               </h2>
               <p className="text-sm text-gray-400">
-                Berdasarkan hasil kuisioner pelayanan kesehatan sekolah
+                Berdasarkan hasil kuesioner pelayanan kesehatan sekolah
               </p>
             </div>
           </div>
@@ -170,9 +172,7 @@ const Index = () => {
                   />
                 </svg>
               </div>
-              <h3 className="font-bold text-gray-800">
-                Saran untuk Sekolah
-              </h3>
+              <h3 className="font-bold text-gray-800">Saran untuk Sekolah</h3>
             </div>
             <ul className="space-y-2.5">
               {data.schoolConclusion.saran.map((saran, idx) => (
@@ -192,9 +192,7 @@ const Index = () => {
                       />
                     </svg>
                   </span>
-                  <span className="text-gray-700 leading-relaxed">
-                    {saran}
-                  </span>
+                  <span className="text-gray-700 leading-relaxed">{saran}</span>
                 </li>
               ))}
             </ul>
@@ -349,7 +347,7 @@ const Index = () => {
                   d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                 />
               </svg>
-              Hasil Kuisioner
+              Hasil Kuesioner
             </h2>
             {data?.questionnaireResult ? (
               <div className="space-y-3">
@@ -405,7 +403,7 @@ const Index = () => {
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                   />
                 </svg>
-                <p className="text-sm">Belum mengisi kuisioner</p>
+                <p className="text-sm">Belum mengisi kuesioner</p>
               </div>
             )}
           </div>

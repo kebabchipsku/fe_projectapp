@@ -93,10 +93,10 @@ const InterventionTable = ({ forWho }) => {
     ));
   } else if (interventionData?.length > 0) {
     tableContent = interventionData.map((intervention, idx) => {
-      const parsedContent = intervention?.options
-        ? JSON.parse(intervention.options)
-        : "";
-      const content = parsedContent.content;
+      // FIX: options already parsed to object by backend
+      const options = intervention?.options ?? {};
+      const content = options?.content;
+      const signature = options?.signature;
 
       return (
         <tr key={intervention.id}>
@@ -123,13 +123,13 @@ const InterventionTable = ({ forWho }) => {
             <div className="flex items-center gap-x-3">
               <button
                 type="button"
-                className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none capitalize"
+                className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-emerald-600 hover:text-emerald-800 focus:outline-hidden focus:text-emerald-800 disabled:pointer-events-none capitalize"
                 aria-haspopup="dialog"
                 aria-expanded="false"
                 aria-controls={`modal-detail-recommendation-${intervention.id}`}
                 data-hs-overlay={`#modal-detail-recommendation-${intervention.id}`}
               >
-                <FaEye className="size-5" />
+                Lihat Hasil
               </button>
             </div>
             <div
@@ -175,8 +175,9 @@ const InterventionTable = ({ forWho }) => {
                   <div id="surat" className="p-6 h-full">
                     <Intervensi
                       values={intervention.recommendation}
-                      content={parsedContent?.content ?? ""}
-                      signature={parsedContent?.signature ?? ""}
+                      // FIX: use content/signature directly from parsed options
+                      content={content ?? ""}
+                      signature={signature ?? ""}
                       institution={intervention?.user}
                     />
                   </div>

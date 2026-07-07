@@ -5,10 +5,7 @@ import { token } from "../../../lib/auth/authAPI";
 import { jwtDecode } from "jwt-decode";
 import { getDashboardSummary } from "../../../lib/parent/dashboardAPI";
 import WelcomeHero from "../../../components/dashboard/WelcomeHero";
-import {
-  findConclusionRule,
-  CONCLUSION_SARAN,
-} from "../../../constants/conclusionRules";
+import { getParentConclusion } from "../../../constants/conclusionRules";
 
 const educationLabelMap = {
   TIDAK_SEKOLAH: "Tidak Sekolah",
@@ -55,71 +52,7 @@ const Index = () => {
 
   const conclusionData = React.useMemo(() => {
     if (!data) return null;
-
-    const items = [
-      {
-        label: "Status Gizi",
-        value: data.latestNutritionStatus || "Tidak Terdata",
-        good: data.latestNutritionStatus === "GIZI BAIK",
-      },
-      {
-        label: "Kebiasaan Sehari-hari",
-        value:
-          data.questionnaireResults?.find((r) => r.title.includes("Kebiasaan"))
-            ?.interpretation || "Belum diisi",
-        good:
-          data.questionnaireResults?.find((r) => r.title.includes("Kebiasaan"))
-            ?.interpretation === "Baik",
-      },
-      {
-        label: "Pengetahuan Gizi",
-        value:
-          data.questionnaireResults?.find((r) =>
-            r.title.includes("Pengetahuan"),
-          )?.interpretation || "Belum diisi",
-        good:
-          data.questionnaireResults?.find((r) =>
-            r.title.includes("Pengetahuan"),
-          )?.interpretation === "Baik",
-      },
-      {
-        label: "Sosial Ekonomi",
-        value: data.socioEconomic?.interpretation || "Belum diisi",
-        good: data.socioEconomic?.interpretation === "Menengah-Tinggi",
-      },
-      {
-        label: "Pendidikan Orang Tua",
-        value:
-          data.parentEducation?.ibu?.category === "Menengah-Tinggi" ||
-          data.parentEducation?.ayah?.category === "Menengah-Tinggi"
-            ? "Menengah-Tinggi"
-            : "Dasar",
-        good:
-          data.parentEducation?.ibu?.category === "Menengah-Tinggi" ||
-          data.parentEducation?.ayah?.category === "Menengah-Tinggi",
-      },
-      {
-        label: "Pelayanan Kesehatan Sekolah",
-        value: data.schoolHealthService?.interpretation || "Belum diisi",
-        good: data.schoolHealthService?.interpretation === "Tinggi",
-      },
-    ];
-
-    const goodCount = items.filter((i) => i.good).length;
-    const rule = findConclusionRule(goodCount);
-    const saran =
-      rule && data.latestNutritionStatus
-        ? CONCLUSION_SARAN[rule.id]?.[data.latestNutritionStatus]?.parent || []
-        : [];
-
-    return {
-      kategori: rule?.name || "Tidak Diketahui",
-      icon: rule?.icon || "❓",
-      color: rule?.color || "from-gray-500 to-gray-600",
-      saran,
-      goodCount,
-      total: items.length,
-    };
+    return getParentConclusion(data);
   }, [data]);
 
   const cards = [
@@ -129,7 +62,7 @@ const Index = () => {
       icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
     },
     {
-      label: "Kuisioner Selesai",
+      label: "Kuesioner Selesai",
       value: `${data?.answeredQuestionnaires ?? 0}/${data?.totalQuestionnaires ?? 0}`,
       icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4",
     },
@@ -195,7 +128,7 @@ const Index = () => {
               Kesimpulan &amp; Saran
             </h2>
             <p className="text-sm text-gray-400">
-              Berdasarkan hasil kuisioner dan data kesehatan
+              Berdasarkan hasil kuesioner dan data kesehatan
             </p>
           </div>
         </div>
@@ -332,7 +265,7 @@ const Index = () => {
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            Hasil Kuisioner
+            Hasil Kuesioner
           </h2>
           {data?.questionnaireResults?.length > 0 ? (
             <div className="space-y-3">
@@ -391,7 +324,7 @@ const Index = () => {
                   d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                 />
               </svg>
-              <p className="text-sm">Belum mengisi kuisioner</p>
+              <p className="text-sm">Belum mengisi kuesioner</p>
             </div>
           )}
         </div>

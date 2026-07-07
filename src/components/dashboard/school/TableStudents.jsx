@@ -11,6 +11,8 @@ import { getClasses } from "../../../lib/classesAPI";
 import ModalContainer from "../../Modal";
 import { getPartners } from "../../../lib/school/partnerAPI";
 import { toast } from "react-toastify";
+import { getSingleRecommendation } from "../../../lib/recommendationAPI";
+import FollowUpLetter from "../healthcare/FollowUpLetter/Index";
 
 const TABLE_HEAD = [
   "Nama Lengkap",
@@ -18,7 +20,7 @@ const TABLE_HEAD = [
   "Angkatan",
   "Semester",
   "Kelas",
-  "Kondisi",
+  "Kondisi / Kesimpulan",
   "Aksi",
 ];
 
@@ -36,6 +38,10 @@ const TableStudents = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [partners, setPartners] = useState([]);
   const [selectedHealthCare, setSelectedHealthCare] = useState("");
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isResultOpen, setIsResultOpen] = useState(false);
+  const [resultData, setResultData] = useState(null);
+  const [resultLoading, setResultLoading] = useState(false);
 
   function onClose() {
     setIsOpen(false);
@@ -93,8 +99,6 @@ const TableStudents = () => {
     FetchClasses,
   );
 
-  console.log({ classesData });
-
   React.useEffect(() => {
     if (classesData) {
       HSStaticMethods.autoInit();
@@ -117,16 +121,44 @@ const TableStudents = () => {
       try {
         const activeToken = await getActiveToken();
         const result = await getPartners("", 0, 9999, activeToken);
-        console.log("Partners for recommendation:", result.data.partnerships);
         setPartners(result.data.partnerships || []);
       } catch (err) {
-        console.log({ err });
         setPartners([]);
       }
     })();
   }, []);
 
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const handleLihatHasil = async (student) => {
+    const recId = student?.completedRecommendation?.id;
+    if (!recId) return;
+    setResultLoading(true);
+    try {
+      const activeToken = await getActiveToken();
+      const res = await getSingleRecommendation(recId, activeToken);
+      const intervention = res.data?.Intervention?.find(
+        (i) => i.forType === "SCHOOL",
+      );
+      let parsedContent = null;
+      const raw = intervention?.options;
+      if (raw) {
+        let val = typeof raw === "string" ? JSON.parse(raw) : raw;
+        if (typeof val === "string") val = JSON.parse(val);
+        parsedContent = val;
+      }
+      setResultData({
+        recommendation: res.data,
+        content: parsedContent?.content || null,
+        signature: parsedContent?.signature || null,
+        institution: intervention?.user || null,
+      });
+      setIsResultOpen(true);
+    } catch (err) {
+      console.log({ err });
+      toast.error("Gagal memuat hasil rekomendasi");
+    } finally {
+      setResultLoading(false);
+    }
+  };
 
   if (studentLoading) {
     tableContent = [...Array(10)].map((_, index) => (
@@ -141,7 +173,6 @@ const TableStudents = () => {
     ));
   } else if (studentData && studentData?.students?.length > 0) {
     tableContent = studentData.students.map((student) => {
-      console.log({ eachStudeent: student });
       return (
         <tr key={student.id}>
           <td className="px-6 py-4 capitalize whitespace-nowrap text-sm font-medium text-gray-800">
@@ -160,35 +191,49 @@ const TableStudents = () => {
             {student?.student?.class?.name || "-"}
           </td>
           <td className="px-6 py-4 whitespace-nowrap capitalize text-sm text-gray-800">
-            {student?.nutrition[0]?.nutritionStatus?.information || "-"}
+            {student?.nutrition[0]?.nutritionStatus?.displayName || "-"}
+            {student?.conclusion ? ` (${student.conclusion})` : ""}
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
             {(() => {
               const isRecommended = student?.isRecommending ?? false;
-              const studentId = student?.student?.id;
+              const hasCompleted = student?.completedRecommendation ?? null;
 
-              return isRecommended ? (
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none capitalize"
-                  disabled={isRecommended}
-                >
-                  Sedang di rekomendasikan
-                </button>
-              ) : (
-                <>
+              if (isRecommended) {
+                return (
                   <button
                     type="button"
                     className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none capitalize"
-                    disabled={isRecommended}
-                    onClick={() => {
-                      setSelectedStudent(student);
-                      setIsOpen(true);
-                    }}
+                    disabled
                   >
-                    Rekomendasikan
+                    Sedang di rekomendasikan
                   </button>
-                </>
+                );
+              }
+
+              if (hasCompleted) {
+                return (
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-emerald-600 hover:text-emerald-800 focus:outline-hidden focus:text-emerald-800 capitalize"
+                    onClick={() => handleLihatHasil(student)}
+                  >
+                    Lihat Hasil
+                  </button>
+                );
+              }
+
+              return (
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none capitalize"
+                  onClick={() => {
+                    setSelectedStudent(student);
+                    setIsOpen(true);
+                  }}
+                >
+                  Rekomendasikan
+                </button>
               );
             })()}
           </td>
@@ -209,6 +254,29 @@ const TableStudents = () => {
 
   return (
     <>
+      <ModalContainer
+        isOpen={isResultOpen}
+        onClose={() => {
+          setIsResultOpen(false);
+          setResultData(null);
+        }}
+      >
+        {resultLoading ? (
+          <p className="text-sm text-gray-500 p-4">Memuat...</p>
+        ) : resultData ? (
+          <div className="w-full">
+            <FollowUpLetter
+              values={resultData.recommendation}
+              content={resultData.content}
+              signature={resultData.signature}
+              institution={resultData.institution}
+            />
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500 p-4">Data tidak ditemukan</p>
+        )}
+      </ModalContainer>
+
       <ModalContainer isOpen={isOpen} onClose={onClose}>
         {partners.length === 0 ? (
           <p className="text-sm text-gray-500 p-4">

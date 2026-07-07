@@ -186,7 +186,7 @@ const Index = () => {
                 {data.questionnaireProgress.totalInstitutions}
               </span>
               <span className="text-gray-500 text-lg">
-                instansi sudah mengisi kuisioner
+                instansi sudah mengisi kuesioner
               </span>
             </div>
           )}
@@ -196,7 +196,7 @@ const Index = () => {
             percentage={data?.questionnaireProgress?.percentage || 0}
           />
           <p className="text-sm text-gray-500 mt-2">
-            Progres Kuisioner Sekolah
+            Progres Kuesioner Sekolah
           </p>
         </div>
       </section>
@@ -422,7 +422,7 @@ const Index = () => {
                   d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                 />
               </svg>
-              Progres Kuisioner
+              Progres Kuesioner
             </h2>
             {data?.questionnaireProgress?.institutionDetails?.length > 0 ? (
               <div className="space-y-2">
@@ -499,12 +499,12 @@ const Index = () => {
             <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
               <div>
                 <h3 className="text-lg font-bold text-gray-800">
-                  Progres Kuisioner per Instansi
+                  Progres Kuesioner per Instansi
                 </h3>
                 <p className="text-sm text-gray-400 mt-0.5">
                   {data?.questionnaireProgress?.completedInstitutions} dari{" "}
                   {data?.questionnaireProgress?.totalInstitutions} instansi
-                  telah menyelesaikan kuisioner
+                  telah menyelesaikan kuesioner
                 </p>
               </div>
               <button

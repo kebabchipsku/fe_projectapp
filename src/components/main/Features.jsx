@@ -84,7 +84,7 @@ const Features = () => {
             </div>
             <div>
               <h3 className="font-bold text-lg text-on-surface">
-                Kuisioner Digital
+                Kuesioner Digital
               </h3>
               <p className="text-sm text-on-surface-variant mt-2 leading-relaxed">
                 Isi kuesioner skrining gizi secara berkala dengan form digital
