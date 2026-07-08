@@ -3,21 +3,24 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuth";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user, refreshToken } = useAuth();
+  const { user, accessToken, refreshToken } = useAuth();
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    const refresh = async () => {
+    const init = async () => {
       try {
-        await refreshToken();
+        // FIX: skip refresh kalau accessToken sudah ada
+        if (!accessToken) {
+          await refreshToken();
+        }
       } catch (error) {
         console.error(error);
       } finally {
         setLoading(false);
       }
     };
-    refresh();
-  }, [refreshToken]);
+    init();
+  }, [accessToken, refreshToken]);
 
   if (loading) {
     return (

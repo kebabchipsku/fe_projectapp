@@ -6,7 +6,18 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = React.useState(null);
-  const [accessToken, setAccessToken] = React.useState(null);
+  const [accessToken, setAccessToken] = React.useState(
+    () => localStorage.getItem("accessToken") || null,
+  );
+
+  // FIX: sinkronkan accessToken ke localStorage setiap kali berubah
+  React.useEffect(() => {
+    if (accessToken) {
+      localStorage.setItem("accessToken", accessToken);
+    } else {
+      localStorage.removeItem("accessToken");
+    }
+  }, [accessToken]);
 
   const refreshToken = useCallback(async () => {
     try {

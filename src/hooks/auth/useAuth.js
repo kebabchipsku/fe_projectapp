@@ -41,6 +41,10 @@ export const useAuth = () => {
               try {
                 const decoded = jwtDecode(responseData.accessToken);
 
+                // FIX: simpan token & user ke context segera
+                setAccessToken(responseData.accessToken);
+                setUser(decoded);
+
                 const userRole = decoded.role;
 
                 if (userRole === "admin") {
@@ -144,6 +148,7 @@ export const useAuth = () => {
           onClose: () => {
             navigate("/");
             localStorage.removeItem("familyMember");
+            localStorage.removeItem("accessToken"); // FIX: bersihkan juga
           },
         },
         error: {
