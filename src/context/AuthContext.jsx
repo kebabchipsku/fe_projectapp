@@ -5,19 +5,18 @@ import { jwtDecode } from "jwt-decode";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = React.useState(null);
+  const [user, setUser] = React.useState(() => {
+    try {
+      const saved = localStorage.getItem("user");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [accessToken, setAccessToken] = React.useState(
     () => localStorage.getItem("accessToken") || null,
   );
-
-  // FIX: sinkronkan accessToken ke localStorage setiap kali berubah
-  React.useEffect(() => {
-    if (accessToken) {
-      localStorage.setItem("accessToken", accessToken);
-    } else {
-      localStorage.removeItem("accessToken");
-    }
-  }, [accessToken]);
 
   const refreshToken = useCallback(async () => {
     try {
@@ -37,7 +36,7 @@ const AuthProvider = ({ children }) => {
 
   const value = useMemo(
     () => ({ user, setUser, accessToken, setAccessToken, refreshToken }),
-    [user, setUser, accessToken, setAccessToken, refreshToken]
+    [user, setUser, accessToken, setAccessToken, refreshToken],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

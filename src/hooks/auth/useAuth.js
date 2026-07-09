@@ -41,9 +41,13 @@ export const useAuth = () => {
               try {
                 const decoded = jwtDecode(responseData.accessToken);
 
-                // FIX: simpan token & user ke context segera
+                // simpan ke context
                 setAccessToken(responseData.accessToken);
                 setUser(decoded);
+
+                // simpan ke localStorage langsung (penting untuk mobile)
+                localStorage.setItem("accessToken", responseData.accessToken);
+                localStorage.setItem("user", JSON.stringify(decoded));
 
                 const userRole = decoded.role;
 
@@ -148,7 +152,8 @@ export const useAuth = () => {
           onClose: () => {
             navigate("/");
             localStorage.removeItem("familyMember");
-            localStorage.removeItem("accessToken"); // FIX: bersihkan juga
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("user");
           },
         },
         error: {

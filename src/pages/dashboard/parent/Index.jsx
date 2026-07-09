@@ -82,9 +82,9 @@ const Index = () => {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="bg-gradient-to-br from-blue-600/10 to-purple-600/10 rounded-3xl p-10 h-52" />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-2xl p-6 h-28 shadow-sm" />
+            <div key={i} className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 h-28 shadow-sm" />
           ))}
         </div>
         <div className="grid lg:grid-cols-2 gap-5">
@@ -206,11 +206,11 @@ const Index = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
         {cards.map((card, i) => (
           <div
             key={card.label}
-            className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+            className="group relative bg-white rounded-xl md:rounded-2xl p-4 md:p-6 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
           >
             <div
               className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br opacity-5 rounded-bl-full"
@@ -220,10 +220,10 @@ const Index = () => {
             />
             <div className="flex items-center gap-4">
               <div
-                className={`p-3 rounded-xl bg-gradient-to-br ${SCORE_COLORS[i].bg} shadow-sm`}
+                className={`p-2 md:p-3 rounded-lg md:rounded-xl bg-gradient-to-br ${SCORE_COLORS[i].bg} shadow-sm`}
               >
                 <svg
-                  className="size-6 text-white"
+                  className="size-5 md:size-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -237,10 +237,10 @@ const Index = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+                <p className="text-[10px] md:text-xs font-medium text-gray-400 uppercase tracking-wider">
                   {card.label}
                 </p>
-                <p className="text-2xl font-bold text-gray-800 mt-0.5">
+                <p className="text-xs md:text-xl lg:text-2xl font-bold text-gray-800 mt-0.5">
                   {card.value}
                 </p>
               </div>

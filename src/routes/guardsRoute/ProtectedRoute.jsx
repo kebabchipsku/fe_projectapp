@@ -9,8 +9,9 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   React.useEffect(() => {
     const init = async () => {
       try {
-        // FIX: skip refresh kalau accessToken sudah ada
-        if (!accessToken) {
+        // cek dari context dulu, fallback ke localStorage (mobile)
+        const token = accessToken || localStorage.getItem("accessToken");
+        if (!token) {
           await refreshToken();
         }
       } catch (error) {
