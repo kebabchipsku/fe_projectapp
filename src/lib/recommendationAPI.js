@@ -83,7 +83,7 @@ export const createInternvetion = async (
 export const getSingleRecommendation = async (id, token) => {
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}recommendation/single/${id}`,
+      `recommendation/single/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -102,7 +102,7 @@ export const getInterventionBelongsToInstitution = async (
 ) => {
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}interventions/institutions`,
+      `interventions/institutions`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -121,7 +121,7 @@ export const getInterventionBelongsToInstitution = async (
 export const deleteIntervention = async (id, token) => {
   try {
     const response = await axios.delete(
-      `${import.meta.env.VITE_BASE_URL}interventions/${id}`,
+      `interventions/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -137,7 +137,7 @@ export const deleteIntervention = async (id, token) => {
 export const getInterventionBelongsToFamily = async (token, filter = {}) => {
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}interventions/families`,
+      `interventions/families`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
