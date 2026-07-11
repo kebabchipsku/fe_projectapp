@@ -6,7 +6,6 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import { getCurrrentDate } from "../../../../lib/utility";
 import { styles } from "./Style";
 import { useAuth } from "../../../../hooks/auth/useAuth";
 import { getUserById } from "../../../../lib/admin/users/usersAPI";
@@ -24,65 +23,59 @@ function renderNode(node, index, ordered = false, number = 1) {
   switch (node.type) {
     case "paragraph":
       return (
-        <Text key={index} style={styles.copTextContent}>
+        <Text key={index} style={styles.bodyText}>
           {node.content?.map((cont, idx) => renderTextNode(cont, idx))}
         </Text>
       );
 
-    case "heading":
+    case "heading": {
       const headingLevel = node.attrs?.level || 1;
       const headingSizes = {
-        1: 16,
-        2: 15,
-        3: 14,
-        4: 12,
+        1: 14,
+        2: 13,
+        3: 12,
+        4: 11,
         5: 10,
-        6: 8,
+        6: 9,
       };
 
       return (
         <Text
           key={index}
           style={{
+            ...styles.bodyText,
+            fontFamily: "Times-Bold",
             fontSize: headingSizes[headingLevel],
-            fontWeight: "bold",
-            marginBottom: 8,
+            marginBottom: 6,
           }}
         >
           {node.content?.map((cont) => cont.text).join(" ")}
         </Text>
       );
+    }
 
     case "bulletList":
       return (
-        <View key={index} style={{ paddingLeft: 12, marginBottom: 8 }}>
+        <View key={index} style={{ marginTop: 4, marginBottom: 8 }}>
           {node.content?.map((item, i) => renderNode(item, i, false))}
         </View>
       );
 
     case "orderedList":
       return (
-        <View key={index} style={{ paddingLeft: 12, marginBottom: 8 }}>
+        <View key={index} style={{ marginTop: 4, marginBottom: 8 }}>
           {node.content?.map((item, i) => renderNode(item, i, true, i + 1))}
         </View>
       );
 
     case "listItem":
       return (
-        <View
-          key={index}
-          style={{ flexDirection: "row", marginBottom: 4, fontSize: 12 }}
-        >
-          <Text style={{ marginRight: 4, fontSize: 12 }}>
-            {ordered ? `${number}.` : `•`}
+        <View key={index} style={styles.recommendationItem}>
+          <Text style={styles.recommendationNumber}>
+            {ordered ? `${number}.` : "•"}
           </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              flex: 1,
-            }}
-          >
+
+          <View style={styles.recommendationContent}>
             {node.content?.map((child, idx) => renderNode(child, idx))}
           </View>
         </View>
@@ -104,7 +97,7 @@ function renderTextNode(node, index) {
     <Text
       key={index}
       style={{
-        fontWeight: isBold ? "bold" : "normal",
+        fontFamily: isBold ? "Times-Bold" : "Times-Roman",
         fontStyle: isItalic ? "italic" : "normal",
         textDecoration: isUnderline ? "underline" : "none",
       }}
@@ -114,24 +107,227 @@ function renderTextNode(node, index) {
   );
 }
 
+function toTitleCase(value) {
+  if (!value || typeof value !== "string") return "-";
+
+  return value
+    .toLowerCase()
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "-";
+
+  const bulan = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "-";
+
+  const tgl = String(date.getDate()).padStart(2, "0");
+  const bln = bulan[date.getMonth()];
+  const thn = date.getFullYear();
+
+  return `${tgl} ${bln} ${thn}`;
+}
+
+function formatCurrentDate() {
+  return formatDate(new Date().toISOString());
+}
+
+function formatGender(gender) {
+  if (gender === "L") return "Laki-laki";
+  if (gender === "P") return "Perempuan";
+  return "-";
+}
+
+function getInstitutionFromSource(institution, currentUser) {
+  return institution?.institution
+    ?? institution?.staff?.institution
+    ?? currentUser?.institution
+    ?? null;
+}
+
+function getStaffFromSource(institution, currentUser) {
+  return institution?.staff ?? currentUser?.staff ?? null;
+}
+
+function getCityName(institutionData) {
+  return (
+    institutionData?.city?.name ||
+    institutionData?.City?.name ||
+    institutionData?.regency?.name ||
+    institutionData?.Regency?.name ||
+    institutionData?.district?.city?.name ||
+    institutionData?.addressCity ||
+    "-"
+  );
+}
+
+function getGovernmentName(cityName) {
+  if (!cityName || cityName === "-") {
+    return "PEMERINTAH KOTA/KABUPATEN";
+  }
+
+  const cleanCity = String(cityName).trim();
+  const lowerCity = cleanCity.toLowerCase();
+
+  if (lowerCity.startsWith("kota ") || lowerCity.startsWith("kabupaten ")) {
+    return `PEMERINTAH ${cleanCity.toUpperCase()}`;
+  }
+
+  if (lowerCity.includes("jakarta")) {
+    return `PEMERINTAH KOTA ADMINISTRASI ${cleanCity.toUpperCase()}`;
+  }
+
+  return `PEMERINTAH KOTA/KABUPATEN ${cleanCity.toUpperCase()}`;
+}
+
+function getUptName(institutionName) {
+  if (!institutionName || institutionName === "-") {
+    return "UPT PUSKESMAS";
+  }
+
+  const cleanName = String(institutionName).trim();
+
+  if (cleanName.toLowerCase().startsWith("upt")) {
+    return cleanName;
+  }
+
+  if (cleanName.toLowerCase().includes("puskesmas")) {
+    return `UPT ${cleanName}`;
+  }
+
+  return `UPT PUSKESMAS ${cleanName}`;
+}
+
+function getPuskesmasAreaName(institutionName, fallbackCityName) {
+  if (!institutionName) return fallbackCityName || "-";
+
+  return (
+    String(institutionName)
+      .replace(/upt/gi, "")
+      .replace(/puskesmas/gi, "")
+      .trim() ||
+    fallbackCityName ||
+    "-"
+  );
+}
+
+function getUptCode(institutionName) {
+  const areaName = getPuskesmasAreaName(institutionName, "");
+  const words = areaName
+    .replace(/[^a-zA-Z\s]/g, "")
+    .split(" ")
+    .filter(Boolean);
+
+  if (words.length === 0) return "PKM";
+
+  return words
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 4);
+}
+
+function getRomanMonth(date = new Date()) {
+  const romans = [
+    "I",
+    "II",
+    "III",
+    "IV",
+    "V",
+    "VI",
+    "VII",
+    "VIII",
+    "IX",
+    "X",
+    "XI",
+    "XII",
+  ];
+
+  return romans[date.getMonth()];
+}
+
+function generateLetterNumber(values, institutionName) {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const monthRoman = getRomanMonth(currentDate);
+  const uptCode = getUptCode(institutionName);
+
+  const rawNumber = values?.letterNumber || values?.recommendationNumber || 1;
+
+  const sequence = String(rawNumber).padStart(3, "0");
+
+  return `440/${sequence}/UPT-${uptCode}/${monthRoman}/${year}`;
+}
+
+function getParentName(values) {
+  return (
+    values?.student?.familyMember?.family?.user?.family?.familyMember?.[0]
+      ?.fullName ||
+    values?.student?.familyMember?.family?.familyMember?.[0]?.fullName ||
+    values?.student?.parent?.familyMember?.fullName ||
+    values?.student?.parent?.fullName ||
+    "-"
+  );
+}
+
+function getSchoolName(values) {
+  return (
+    values?.submittedBy?.institution?.name ||
+    values?.student?.institution?.name ||
+    values?.student?.school?.name ||
+    "-"
+  );
+}
+
+function renderDefaultRecommendations() {
+  const items = [
+    "Memberikan makanan bergizi seimbang sesuai kebutuhan anak.",
+    "Meningkatkan konsumsi buah dan sayur setiap hari.",
+    "Membatasi makanan/minuman tinggi gula, garam, dan lemak.",
+    "Melakukan pemantauan pertumbuhan secara berkala di fasilitas kesehatan.",
+  ];
+
+  return (
+    <View style={styles.defaultRecommendationList}>
+      {items.map((item, index) => (
+        <View key={item} style={styles.recommendationItem}>
+          <Text style={styles.recommendationNumber}>{index + 1}.</Text>
+          <Text style={styles.recommendationText}>{item}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 export default function Index({
   values,
   content,
   signature,
   institution = null,
 }) {
-  if (!values && !institution) return null;
-  let institut = null;
-  let username = "";
-
-  if (institution) {
-    institut = institution?.institution;
-    username = institution?.username;
-  }
   const { user, accessToken, setAccessToken, setUser } = useAuth();
 
   const getActiveToken = async () => {
     const currentTime = new Date().getTime();
+
     if (user?.exp * 1000 < currentTime) {
       const response = await token();
       setAccessToken(response.data.accessToken);
@@ -139,144 +335,187 @@ export default function Index({
       setUser(decoded);
       return response.data.accessToken;
     }
+
     return accessToken;
   };
 
   const fetchUserById = async (id) => {
-    const t = await getActiveToken();
-    const user = await getUserById(id, t);
-
-    return user.data;
+    const activeToken = await getActiveToken();
+    const response = await getUserById(id, activeToken);
+    return response.data;
   };
 
-  const { data: currentUser } = useSWR(`user-${user.id}`, () =>
-    fetchUserById(user.id),
+  const { data: currentUser } = useSWR(
+    user?.id ? `user-${user.id}` : null,
+    () => fetchUserById(user.id),
   );
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "-";
-    const bulan = [
-      "Januari",
-      "Februari",
-      "Maret",
-      "April",
-      "Mei",
-      "Juni",
-      "Juli",
-      "Agustus",
-      "September",
-      "Oktober",
-      "November",
-      "Desember",
-    ];
-    const date = new Date(dateString);
-    const tgl = date.getDate();
-    const bln = bulan[date.getMonth()];
-    const thn = date.getFullYear();
-    return `${tgl} ${bln} ${thn}`;
-  };
+  if (!values && !institution) return null;
 
-  const formatGender = (gender) => {
-    if (gender === "L") return "Laki-Laki";
-    if (gender === "P") return "Perempuan";
-    return "-";
-  };
+  const institutionData = getInstitutionFromSource(institution, currentUser);
+  const staffData = getStaffFromSource(institution, currentUser);
+
+  const institutionName = institutionData?.name ?? "-";
+  const cityName = getCityName(institutionData);
+  const governmentName = getGovernmentName(cityName);
+  const uptName = getUptName(institutionName);
+  const puskesmasAreaName = getPuskesmasAreaName(institutionName, cityName);
+
+  const letterNumber = generateLetterNumber(values, institutionName);
+
+  const studentName = values?.student?.familyMember?.fullName || "-";
+  const nisn = values?.student?.nisn || values?.student?.nis || "-";
+  const birthDate = formatDate(values?.student?.familyMember?.birthDate);
+  const gender = formatGender(values?.student?.familyMember?.gender);
+  const address =
+    values?.student?.familyMember?.SocioEconomic?.address ||
+    values?.student?.familyMember?.address ||
+    "-";
+  const parentName = getParentName(values);
+  const schoolName = getSchoolName(values);
+
+  const staffName =
+    staffData?.fullName ||
+    institution?.username ||
+    currentUser?.username ||
+    "-";
+
+  const renderedContent = renderTiptapToPdf(content);
 
   const pdfDocument = (
-    <Document title="Recommendation Letter">
+    <Document title="Surat Rekomendasi">
       <Page size="A4" style={styles.page}>
-        <View style={styles.cop}>
-          <Text style={styles.copTextTitle}>Dinas Kesehatan</Text>
-          <Text style={styles.copTextSubTitle}>
-            UPT {institut?.name ?? currentUser?.institution?.name ?? "-"}
+        {/* KOP SURAT */}
+        <View style={styles.letterhead}>
+          <Text style={styles.governmentText}>{governmentName}</Text>
+          <Text style={styles.healthOfficeText}>DINAS KESEHATAN</Text>
+          <Text style={styles.uptText}>{uptName.toUpperCase()}</Text>
+
+          <Text style={styles.addressText}>
+            {institutionData?.address || "-"}
           </Text>
-          <Text style={styles.copTextSubTitle}>
-            {institut
-              ? institut.address
-              : (currentUser?.institution?.address ?? "-")}
+
+          <Text style={styles.contactText}>
+            Telp. {institutionData?.phone || "-"} | Email:{" "}
+            {institutionData?.email || "-"}
           </Text>
-          <Text style={styles.copTextContent}>
-            {institut
-              ? institut.phone
-              : (currentUser?.institution?.phone ?? "-")}
-            |{" "}
-            {institut
-              ? institut.email
-              : (currentUser?.institution?.email ?? "-")}
-          </Text>
-          <Text style={styles.copBorderBottom}></Text>
         </View>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>SURAT REKOMENDASI</Text>
+
+        <View style={styles.doubleLine}>
+          <View style={styles.lineThick} />
+          <View style={styles.lineThin} />
         </View>
-        <View style={styles.information}>
-          <Text style={styles.informationTextTitle}>
-            Dengan ini kami sampaikan bahwa berdasarkan hasil pemantauan
-            melalui sistem aplikasi gizi sekolah dasar yang di rujuk oleh{" "}
-            {values.submittedBy?.institution?.name}, ditemukan data siswa
-            berikut:
+
+        {/* JUDUL SURAT */}
+        <View style={styles.titleSection}>
+          <Text style={styles.letterTitle}>SURAT REKOMENDASI</Text>
+          <Text style={styles.letterNumber}>Nomor: {letterNumber}</Text>
+        </View>
+
+        {/* PEMBUKA */}
+        <View style={styles.bodySection}>
+          <Text style={styles.bodyText}>
+            Berdasarkan hasil pemantauan status gizi melalui Sistem Informasi
+            Gizi Sekolah yang dilakukan oleh {uptName} terhadap peserta didik{" "}
+            {schoolName}, dengan ini disampaikan hasil sebagai berikut:
           </Text>
-          <View style={styles.informationTextContainer}>
-            <Text style={styles.informationText1}>Nama Siswa</Text>
-            <Text style={styles.informationText2}>:</Text>
-            <Text style={styles.informationText3}>
-              {values?.student?.familyMember?.fullName || "-"}
-            </Text>
+        </View>
+
+        {/* DATA SISWA */}
+        <View style={styles.studentInfoSection}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Nama Siswa</Text>
+            <Text style={styles.infoColon}>:</Text>
+            <Text style={styles.infoValue}>{studentName}</Text>
           </View>
-          <View style={styles.informationTextContainer}>
-            <Text style={styles.informationText1}>NISN</Text>
-            <Text style={styles.informationText2}>:</Text>
-            <Text style={styles.informationText3}>
-              {values?.student?.nis || "-"}
-            </Text>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>NISN</Text>
+            <Text style={styles.infoColon}>:</Text>
+            <Text style={styles.infoValue}>{nisn}</Text>
           </View>
-          <View style={styles.informationTextContainer}>
-            <Text style={styles.informationText1}>Tanggal Lahir</Text>
-            <Text style={styles.informationText2}>:</Text>
-            <Text style={styles.informationText3}>
-              {formatDate(values?.student?.familyMember?.birthDate) ?? "-"}
-            </Text>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Tanggal Lahir</Text>
+            <Text style={styles.infoColon}>:</Text>
+            <Text style={styles.infoValue}>{birthDate}</Text>
           </View>
-          <View style={styles.informationTextContainer}>
-            <Text style={styles.informationText1}>Jenis Kelamin</Text>
-            <Text style={styles.informationText2}>:</Text>
-            <Text style={styles.informationText3}>
-              {formatGender(values?.student?.familyMember?.gender) ?? "-"}
-            </Text>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Jenis Kelamin</Text>
+            <Text style={styles.infoColon}>:</Text>
+            <Text style={styles.infoValue}>{gender}</Text>
           </View>
-          <View style={styles.informationTextContainer}>
-            <Text style={styles.informationText1}>Alamat</Text>
-            <Text style={styles.informationText2}>:</Text>
-            <Text style={styles.informationText3}>
-              {values?.student?.familyMember?.SocioEconomic?.address ?? "-"}
-            </Text>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Alamat</Text>
+            <Text style={styles.infoColon}>:</Text>
+            <Text style={styles.infoValue}>{address}</Text>
           </View>
-          <View style={styles.informationTextContainer}>
-            <Text style={styles.informationText1}>Orang Tua / Wali</Text>
-            <Text style={styles.informationText2}>:</Text>
-            <Text style={styles.informationText3}>
-              {values.student?.familyMember?.family?.user?.family
-                ?.familyMember[0]?.fullName ?? "-"}
-            </Text>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Nama Orang Tua/Wali</Text>
+            <Text style={styles.infoColon}>:</Text>
+            <Text style={styles.infoValue}>{parentName}</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Sekolah</Text>
+            <Text style={styles.infoColon}>:</Text>
+            <Text style={styles.infoValue}>{schoolName}</Text>
           </View>
         </View>
-        <View style={styles.description}>
-          {renderTiptapToPdf(content)}
-        </View>
-        <View style={styles.footer}>
-          <Text style={styles.descriptionText}>
-            {getCurrrentDate() ?? "-"}
+
+        {/* ISI REKOMENDASI */}
+        <View style={styles.recommendationSection}>
+          <Text style={styles.bodyText}>
+            Hasil pemeriksaan menunjukkan bahwa siswa memerlukan perhatian
+            terhadap pola makan dan status gizinya. Oleh karena itu, orang
+            tua/wali disarankan untuk:
           </Text>
-          <View style={styles.imageWrapper}>
-            {signature && <Image src={signature} style={styles.image} />}
+
+          <View style={styles.recommendationContentWrapper}>
+            {renderedContent && renderedContent.length > 0
+              ? renderedContent
+              : renderDefaultRecommendations()}
           </View>
-          <Text style={styles.signatureName}>
-            {institution?.staff?.fullName ??
-              institution?.username ??
-              currentUser?.staff?.fullName ??
-              currentUser?.username ??
-              "-"}
+        </View>
+
+        {/* PENUTUP */}
+        <View style={styles.closingSection}>
+          <Text style={styles.bodyText}>
+            Demikian surat rekomendasi ini dibuat untuk dipergunakan sebagaimana
+            mestinya.
           </Text>
+          <Text style={styles.bodyText}>
+            Atas perhatian dan kerja samanya kami ucapkan terima kasih.
+          </Text>
+        </View>
+
+        {/* TANDA TANGAN */}
+        <View style={styles.signatureSection}>
+          <Text style={styles.signatureDate}>
+            {toTitleCase(puskesmasAreaName)}, {formatCurrentDate()}
+          </Text>
+
+          {staffData ? (
+            <Text style={styles.signaturePosition}>
+              UPT PUSKESMAS {toTitleCase(puskesmasAreaName)}
+            </Text>
+          ) : (
+            <>
+              <Text style={styles.signaturePosition}>Kepala UPT Puskesmas</Text>
+              <Text style={styles.signaturePosition}>
+                {toTitleCase(puskesmasAreaName)}
+              </Text>
+            </>
+          )}
+
+          <View style={styles.signatureImageWrapper}>
+              <Image src={signature} style={styles.signatureImage} />
+          </View>
+
+          <Text style={styles.signatureName}>{staffName}</Text>
         </View>
       </Page>
     </Document>
@@ -292,6 +531,7 @@ export default function Index({
             </div>
           );
         }
+
         return (
           <object
             data={url}
@@ -304,12 +544,12 @@ export default function Index({
               Browser tidak mendukung tampilan PDF.
             </p>
             <a
-                href={url}
-                download="rekomendasi.pdf"
-                className="text-blue-600 hover:underline"
-              >
-                Download PDF
-              </a>
+              href={url}
+              download="surat-rekomendasi.pdf"
+              className="text-blue-600 hover:underline"
+            >
+              Download PDF
+            </a>
           </object>
         );
       }}

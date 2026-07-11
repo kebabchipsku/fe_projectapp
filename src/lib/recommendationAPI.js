@@ -82,7 +82,7 @@ export const createInternvetion = async (
 
 export const getSingleRecommendation = async (id, token) => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `recommendation/single/${id}`,
       {
         headers: {
@@ -101,7 +101,7 @@ export const getInterventionBelongsToInstitution = async (
   filter = {}
 ) => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `interventions/institutions`,
       {
         headers: {
@@ -120,7 +120,7 @@ export const getInterventionBelongsToInstitution = async (
 
 export const deleteIntervention = async (id, token) => {
   try {
-    const response = await axios.delete(
+    const response = await api.delete(
       `interventions/${id}`,
       {
         headers: {
@@ -136,7 +136,7 @@ export const deleteIntervention = async (id, token) => {
 
 export const getInterventionBelongsToFamily = async (token, filter = {}) => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `interventions/families`,
       {
         headers: {

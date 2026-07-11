@@ -2,111 +2,216 @@ import { StyleSheet } from "@react-pdf/renderer";
 
 export const styles = StyleSheet.create({
   page: {
-    // flexDirection: "row",
-    backgroundColor: "#FFF",
-  },
-  section: {
-    margin: 10,
-    padding: 10,
-    flexGrow: 1,
-  },
-  cop: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    marginVertical: 20,
+    paddingTop: 30,
+    paddingBottom: 24,
     paddingHorizontal: 50,
-  },
-  copTextTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  copTextSubTitle: {
-    fontSize: 15,
-    marginTop: 2,
-  },
-  copTextContent: {
+    fontFamily: "Times-Roman",
     fontSize: 12,
-    marginTop: 2,
-    marginBottom: 10,
+    color: "#000000",
+    lineHeight: 1.35,
   },
-  copBorderBottom: {
-    width: "100%",
-    height: 1,
-    backgroundColor: "#000",
-    marginTop: 10,
+
+  letterhead: {
+    textAlign: "center",
+    marginBottom: 4,
   },
-  header: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  headerText: {
-    fontSize: 16,
-    fontWeight: "bold",
+
+  governmentText: {
+    fontFamily: "Times-Bold",
+    fontSize: 13,
+    textTransform: "uppercase",
     marginBottom: 2,
   },
-  information: {
-    display: "flex",
-    flexDirection: "column",
-    marginTop: 20,
-    paddingHorizontal: 50,
+
+  healthOfficeText: {
+    fontFamily: "Times-Bold",
+    fontSize: 15,
+    textTransform: "uppercase",
+    marginBottom: 2,
   },
-  informationTextTitle: {
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  informationTextContainer: {
-    display: "flex",
-    flexDirection: "row",
+
+  uptText: {
+    fontFamily: "Times-Bold",
     fontSize: 12,
-    marginBottom: 5,
-    gap: 10,
+    textTransform: "uppercase",
+    marginBottom: 2,
   },
-  informationText1: {
-    maxWidth: "100px",
-    minWidth: "100px",
+
+  addressText: {
+    fontFamily: "Times-Roman",
+    fontSize: 10,
+    marginBottom: 1,
   },
-  informationText2: {
-    maxWidth: "5px",
-    minWidth: "5px",
+
+  contactText: {
+    fontFamily: "Times-Roman",
+    fontSize: 10,
   },
-  informationText3: {
-    maxWidth: "250px",
-    textTransform: "capitalize",
+
+  doubleLine: {
+    marginTop: 2,
+    marginBottom: 16,
   },
-  description: {
-    display: "flex",
-    flexDirection: "column",
-    marginTop: 20,
-    paddingHorizontal: 50,
+
+  lineThick: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#000000",
+    borderBottomStyle: "solid",
+    marginBottom: 2,
   },
-  descriptionText: {
-    fontSize: 12,
-    marginBottom: 5,
-    position: "relative",
+
+  lineThin: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#000000",
+    borderBottomStyle: "solid",
   },
-  footer: {
-    display: "flex",
-    justifyContent: "flex-end",
-    flexDirection: "column",
-    alignItems: "flex-end",
-    marginTop: 20,
-    paddingHorizontal: 50,
-    position: "relative",
-  },
-  imageWrapper: {
-    display: "flex",
+
+  titleSection: {
     alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 10,
+    marginBottom: 18,
   },
-  image: {
-    width: "7rem",
-    height: "auto",
-  },
-  signatureName: {
-    fontWeight: "bold",
+
+  letterTitle: {
+    fontFamily: "Times-Bold",
+    fontSize: 13,
     textDecoration: "underline",
+    marginBottom: 3,
+  },
+
+  letterNumber: {
+    fontFamily: "Times-Roman",
+    fontSize: 12,
+  },
+
+  bodySection: {
+    marginBottom: 14,
+  },
+
+  bodyText: {
+    fontFamily: "Times-Roman",
+    fontSize: 12,
+    textAlign: "justify",
+    lineHeight: 1.35,
+    marginBottom: 3,
+  },
+
+  studentInfoSection: {
+    marginLeft: 0,
+    marginBottom: 14,
+  },
+
+  infoRow: {
+    flexDirection: "row",
+    marginBottom: 4,
+  },
+
+  infoLabel: {
+    fontFamily: "Times-Roman",
+    fontSize: 12,
+    width: 150,
+  },
+
+  infoColon: {
+    fontFamily: "Times-Roman",
+    fontSize: 12,
+    width: 16,
+  },
+
+  infoValue: {
+    fontFamily: "Times-Roman",
+    fontSize: 12,
+    flex: 1,
+  },
+
+  recommendationSection: {
+    marginBottom: 14,
+  },
+
+  recommendationContentWrapper: {
+    marginTop: 6,
+  },
+
+  defaultRecommendationList: {
+    marginTop: 6,
+  },
+
+  recommendationItem: {
+    flexDirection: "row",
+    marginBottom: 4,
+  },
+
+  recommendationNumber: {
+    fontFamily: "Times-Roman",
+    fontSize: 12,
+    width: 20,
+  },
+
+  recommendationText: {
+    fontFamily: "Times-Roman",
+    fontSize: 12,
+    flex: 1,
+    lineHeight: 1.35,
+  },
+
+  recommendationContent: {
+    flex: 1,
+  },
+
+  closingSection: {
+    marginTop: 8,
+    marginBottom: 16,
+  },
+
+  signatureSection: {
+    width: 190,
+    alignSelf: "flex-end",
+    alignItems: "center",
+    marginTop: 6,
+  },
+
+  signatureDate: {
+    fontFamily: "Times-Roman",
+    fontSize: 12,
+    marginBottom: 1,
+    textAlign: "center",
+  },
+
+  signaturePosition: {
+    fontFamily: "Times-Roman",
+    fontSize: 12,
+    textAlign: "center",
+    lineHeight: 1.2,
+  },
+
+  signatureImageWrapper: {
+    height: 52,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 4,
+    marginBottom: 2,
+  },
+
+  signatureImage: {
+    width: 110,
+    height: 48,
+    objectFit: "contain",
+  },
+
+  emptySignatureText: {
+    height: 48,
+  },
+
+  signatureName: {
+    fontFamily: "Times-Bold",
+    fontSize: 12,
+    textDecoration: "underline",
+    textAlign: "center",
+    marginBottom: 2,
+  },
+
+  nipText: {
+    fontFamily: "Times-Roman",
+    fontSize: 11,
+    textAlign: "center",
   },
 });

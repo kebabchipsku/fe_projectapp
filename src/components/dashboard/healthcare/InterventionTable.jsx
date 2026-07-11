@@ -193,7 +193,7 @@ const InterventionTable = ({ forWho }) => {
       <tr>
         <td colSpan={TABLE_HEAD.length} className="p-4 text-center">
           <h1 className="text-gray-900 text-sm font-normal">
-            Belum ada rekomendasi yang tersedia
+            Belum ada riwayat penanganan yang tersedia
           </h1>
         </td>
       </tr>
